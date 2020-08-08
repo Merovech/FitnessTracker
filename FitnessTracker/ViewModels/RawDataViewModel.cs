@@ -1,0 +1,40 @@
+﻿using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using FitnessTracker.Messages;
+using FitnessTracker.Models;
+using FitnessTracker.Services.Interfaces;
+using FitnessTracker.Utilities;
+using GalaSoft.MvvmLight;
+
+namespace FitnessTracker.ViewModels
+{
+	public class RawDataViewModel : ViewModelBase
+	{
+		private readonly IDatabaseService _databaseService;
+		private ObservableCollection<DailyRecord> _data;
+
+		public RawDataViewModel(IDatabaseService databaseService)
+		{
+			Guard.AgainstNull(databaseService, nameof(databaseService));
+			_databaseService = databaseService;
+			_data = new ObservableCollection<DailyRecord>();
+
+			MessengerInstance.Register<NewDataAvailableMessage>(this, async (msg) => await RefreshData());
+			Task.Run(async () => await RefreshData());
+		}
+
+		public ObservableCollection<DailyRecord> Data
+		{
+			get => _data;
+			set => Set(ref _data, value);
+		}
+
+		private async Task RefreshData()
+		{
+			var newData = await _databaseService.GetAll();
+			Data = new ObservableCollection<DailyRecord>(newData);
+
+			MessengerInstance.Send(new DataRetrievedMessage(newData));
+		}
+	}
+}

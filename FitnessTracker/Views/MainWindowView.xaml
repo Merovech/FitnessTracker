@@ -1,0 +1,41 @@
+﻿<Window x:Class="FitnessTracker.Views.MainWindowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:v="clr-namespace:FitnessTracker.Views"
+        mc:Ignorable="d"
+		DataContext="{Binding Source={StaticResource Locator}, Path=MainViewModel}"
+        Title="MainWindow" Height="450" Width="800">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="25" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="25" />
+		</Grid.RowDefinitions>
+		<Menu Grid.Row="0">
+			<MenuItem Header="_File">
+				<MenuItem Header="_Import" Command="{Binding ImportCommand}"/>
+				<Separator />
+				<MenuItem Header="E_xit" Click="OnExit"/>
+			</MenuItem>
+		</Menu>
+
+		<TabControl Grid.Row="1">
+			<TabItem Header="Home">
+				<v:WeightChartView />
+			</TabItem>
+			<TabItem Header="Raw Data">
+				<v:RawDataView />
+			</TabItem>
+			<TabItem Header="Debug Statistics">
+				<v:DebugView/>
+			</TabItem>
+		</TabControl>
+
+		<StatusBar Grid.Row="2">
+			<StatusBarItem Content="Status:" />
+			<StatusBarItem Content="{Binding Status}" />
+		</StatusBar>
+	</Grid>
+</Window>
