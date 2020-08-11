@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FitnessTracker.Views"
              mc:Ignorable="d" 
-			 Width="225"
-             d:DesignHeight="450" d:DesignWidth="225"
+			 Width="175"
 			 DataContext="{Binding Source={StaticResource Locator}, Path=SummaryViewModel}">
 	<UserControl.Background>
 		<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">

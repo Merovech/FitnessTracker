@@ -24,6 +24,7 @@ namespace FitnessTracker
 
 		private void ConfigureServices(IServiceCollection services)
 		{
+			// TODO: Reflection to load this using naming conventions
 			RegisterViews(services);
 			RegisterViewModels(services);
 			RegisterDatabaseContexts(services);
@@ -38,6 +39,7 @@ namespace FitnessTracker
 			services.AddSingleton<RawDataView>();
 			services.AddSingleton<DebugView>();
 			services.AddSingleton<SummaryView>();
+			services.AddSingleton<AddEditDataView>();
 		}
 
 		private void RegisterViewModels(IServiceCollection services)
@@ -48,6 +50,7 @@ namespace FitnessTracker
 			services.AddSingleton<RawDataViewModel>();
 			services.AddSingleton<DebugViewModel>();
 			services.AddSingleton<SummaryViewModel>();
+			services.AddSingleton<AddEditDataViewModel>();
 		}
 
 		private void RegisterDatabaseContexts(IServiceCollection services)

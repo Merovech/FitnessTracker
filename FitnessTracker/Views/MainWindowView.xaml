@@ -20,23 +20,31 @@
 			<StatusBarItem Content="{Binding Status}" />
 		</StatusBar>
 		<v:SummaryView DockPanel.Dock="Right" />
-		<TabControl BorderThickness="0">
-			<TabItem Header="Home">
-				<Grid>
-					<Grid.RowDefinitions>
-						<RowDefinition />
-						<RowDefinition />
-					</Grid.RowDefinitions>
-					<v:WeightChartView Grid.Row="0"/>
-					<v:MovementChartView Grid.Row="1" />
-				</Grid>
-			</TabItem>
-			<TabItem Header="Raw Data">
-				<v:RawDataView />
-			</TabItem>
-			<TabItem Header="Debug Statistics">
-				<v:DebugView/>
-			</TabItem>
-		</TabControl>
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="10"/>
+				<RowDefinition />
+			</Grid.RowDefinitions>
+			<v:AddEditDataView Grid.Row="0" HorizontalAlignment="Center"/>
+			<TabControl Grid.Row="2" BorderThickness="0">
+				<TabItem Header="Home">
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition />
+							<RowDefinition />
+						</Grid.RowDefinitions>
+						<v:WeightChartView Grid.Row="0"/>
+						<v:MovementChartView Grid.Row="1" />
+					</Grid>
+				</TabItem>
+				<TabItem Header="Raw Data">
+					<v:RawDataView />
+				</TabItem>
+				<TabItem Header="Debug Statistics">
+					<v:DebugView/>
+				</TabItem>
+			</TabControl>
+		</Grid>
 	</DockPanel>
 </Window>

@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="FitnessTracker.Views.AddEditDataView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FitnessTracker.Views"
+             mc:Ignorable="d" 
+			 Background="White"
+			 Height="40" Width="405"
+			 DataContext="{Binding Source={StaticResource Locator}, Path=AddEditDataViewModel}">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="150" />
+			<ColumnDefinition Width="10" />
+			<ColumnDefinition Width="75" />
+			<ColumnDefinition Width="10" />
+			<ColumnDefinition Width="75" />
+			<ColumnDefinition Width="10" />
+			<ColumnDefinition Width="75" />
+		</Grid.ColumnDefinitions>
+		<TextBlock Grid.Row="0" Grid.Column="0" FontSize="10" FontWeight="Bold" Foreground="#888888" Text="Date" />
+		<TextBlock Grid.Row="0" Grid.Column="2" FontSize="10" FontWeight="Bold" Foreground="#888888" Text="Weight" />
+		<TextBlock Grid.Row="0" Grid.Column="4" FontSize="10" FontWeight="Bold" Foreground="#888888" Text="Distance" />
+
+		<DatePicker Grid.Row="1" Grid.Column="0" SelectedDateFormat="Short" />
+		<TextBox Grid.Row="1" Grid.Column="2" />
+		<TextBox Grid.Row="1" Grid.Column="4" />
+		<Button Grid.Row="1" Grid.Column="6" Visibility="{Binding IsNewDataPoint, Converter={StaticResource FalseToVisibleConverter}}" Content="Add" />
+		<Button Grid.Row="1" Grid.Column="6" Visibility="{Binding IsNewDataPoint, Converter={StaticResource TrueToVisibileConverter}}" Content="Edit" />
+	</Grid>
+</UserControl>
