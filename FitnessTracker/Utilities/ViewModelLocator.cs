@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FitnessTracker.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace FitnessTracker.ViewModels
+namespace FitnessTracker.Utilities
 {
 	public class ViewModelLocator
 	{
@@ -11,5 +12,9 @@ namespace FitnessTracker.ViewModels
 		public RawDataViewModel RawDataViewModel => App.ServiceProvider.GetService<RawDataViewModel>();
 
 		public WeightChartViewModel WeightChartViewModel => App.ServiceProvider.GetService<WeightChartViewModel>();
+
+		public MovementChartViewModel MovementChartViewModel => App.ServiceProvider.GetService<MovementChartViewModel>();
+
+		public SummaryViewModel SummaryViewModel => App.ServiceProvider.GetService<SummaryViewModel>();
 	}
 }

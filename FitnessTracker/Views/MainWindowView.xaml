@@ -22,7 +22,14 @@
 		<v:SummaryView DockPanel.Dock="Right" />
 		<TabControl BorderThickness="0">
 			<TabItem Header="Home">
-				<v:WeightChartView />
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition />
+						<RowDefinition />
+					</Grid.RowDefinitions>
+					<v:WeightChartView Grid.Row="0"/>
+					<v:MovementChartView Grid.Row="1" />
+				</Grid>
 			</TabItem>
 			<TabItem Header="Raw Data">
 				<v:RawDataView />

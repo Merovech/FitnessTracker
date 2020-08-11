@@ -5,10 +5,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FitnessTracker.Views"
              mc:Ignorable="d" 
-			 Width="240"
-             d:DesignHeight="450" d:DesignWidth="240" Background="White">
+			 Width="225"
+             d:DesignHeight="450" d:DesignWidth="225"
+			 DataContext="{Binding Source={StaticResource Locator}, Path=SummaryViewModel}">
+	<UserControl.Background>
+		<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+			<GradientStop Color="#FFFFFF" Offset="0.5" />
+			<GradientStop Color="AliceBlue" Offset="1.0" />
+		</LinearGradientBrush>
+	</UserControl.Background>
 	<Border BorderBrush="#888888" BorderThickness="1 0 0 0">
-		<Grid>
+		<Grid ScrollViewer.VerticalScrollBarVisibility="Auto">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto" />
 				<RowDefinition Height="0.5*" />
@@ -19,57 +26,80 @@
 			<Border Grid.Row="0" Padding="3" Background="LightGray">
 				<TextBlock FontWeight="Bold" FontSize="14">Weight (lbs)</TextBlock>
 			</Border>
-			<Grid Grid.Row="1">
+			<Grid Grid.Row="1" Margin="3 0 0 0">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto" />
+					<RowDefinition Height="10" />
 					<RowDefinition Height="Auto" />
+					<RowDefinition Height="10" />
 					<RowDefinition Height="Auto" />
+					<RowDefinition Height="10" />
 					<RowDefinition Height="Auto" />
+					<RowDefinition Height="10" />
 					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="135" />
-					<ColumnDefinition Width="5" />
-					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition Width="2" />
-					<ColumnDefinition Width="Auto" />
-				</Grid.ColumnDefinitions>
-				<TextBlock Grid.Row="0" Grid.Column="0" Margin="3 0 0 0" FontWeight="Bold" Foreground="#666666" VerticalAlignment="Center" Text="Current" />
-				<TextBlock Grid.Row="0" Grid.Column="2" FontWeight="Bold" FontSize="14" Text="200" />
-				<TextBlock Grid.Row="1" Grid.Column="0" Margin="3 0 0 0" FontWeight="Bold" Foreground="#666666" VerticalAlignment="Center" Text="Total Gain/Loss" />
-				<TextBlock Grid.Row="1" Grid.Column="2" FontWeight="Bold" FontSize="14" Text="200" />
-				<TextBlock Grid.Row="2" Grid.Column="0" Margin="3 0 0 0" FontWeight="Bold" Foreground="#666666" VerticalAlignment="Center" Text="Change Since Previous: " />
-				<TextBlock Grid.Row="2" Grid.Column="2" FontWeight="Bold" FontSize="14" Text="200" />
-				<TextBlock Grid.Row="3" Grid.Column="0" Margin="3 0 0 0" FontWeight="Bold" Foreground="#666666" VerticalAlignment="Center" Text="Lowest (all-time): " />
-				<TextBlock Grid.Row="3" Grid.Column="2" FontWeight="Bold" FontSize="14" Text="200" />
-				<TextBlock Grid.Row="3" Grid.Column="4" VerticalAlignment="Center" Text="(12/12/2020)"/>
-				<TextBlock Grid.Row="4" Grid.Column="0" Margin="3 0 0 0" FontWeight="Bold" Foreground="#666666" VerticalAlignment="Center" Text="Highest (all-time): " />
-				<TextBlock Grid.Row="4" Grid.Column="2" FontWeight="Bold" FontSize="14" Text="200" />
-				<TextBlock Grid.Row="4" Grid.Column="4" VerticalAlignment="Center" Text="(12/12/2020)" />
+
+				<StackPanel Grid.Row="0">
+					<TextBlock FontWeight="Bold" Foreground="#666666" Text="Current" />
+					<TextBlock FontWeight="Bold" FontSize="14" Text="{Binding SummaryData.CurrentWeight, StringFormat=N1}" />
+				</StackPanel>
+
+				<StackPanel Grid.Row="2">
+					<TextBlock FontWeight="Bold" Foreground="#666666" Text="Total Gain/Loss" />
+					<TextBlock FontWeight="Bold" FontSize="14" Text="{Binding SummaryData.TotalWeightChange, StringFormat=N1}" />
+				</StackPanel>
+
+				<StackPanel Grid.Row="4">
+					<TextBlock FontWeight="Bold" Foreground="#666666" Text="Change Since Previous: " />
+					<TextBlock FontWeight="Bold" FontSize="14" Text="{Binding SummaryData.WeightChangeSincePrevious, StringFormat=N1}" />
+				</StackPanel>
+
+				<StackPanel Grid.Row="6">
+					<TextBlock FontWeight="Bold" Foreground="#666666" Text="Lowest (all-time): " />
+					<StackPanel Orientation="Horizontal">
+						<TextBlock FontWeight="Bold" FontSize="14" Text="{Binding SummaryData.LowestWeight, StringFormat=N1}" />
+						<TextBlock Margin="2 0 0 0" VerticalAlignment="Center" Text="{Binding SummaryData.LowestWeightDate, StringFormat='({0:d})'}"/>
+					</StackPanel>
+				</StackPanel>
+
+				<StackPanel Grid.Row="8">
+					<TextBlock FontWeight="Bold" Foreground="#666666" Text="Highest (all-time): " />
+					<StackPanel Orientation="Horizontal">
+						<TextBlock FontWeight="Bold" FontSize="14" Text="{Binding SummaryData.HighestWeight, StringFormat=N1}" />
+						<TextBlock Margin="2 0 0 0" VerticalAlignment="Center" Text="{Binding SummaryData.HighestWeightDate, StringFormat='({0:d})'}" />
+					</StackPanel>
+				</StackPanel>
 			</Grid>
 			<Border Grid.Row="3" Padding="3" Background="LightGray">
 				<TextBlock FontWeight="Bold" FontSize="14">Distance (mi)</TextBlock>
 			</Border>
-			<Grid Grid.Row="4">
+			<Grid Grid.Row="4" Margin="3 0 0 0" >
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto" />
+					<RowDefinition Height="10" />
 					<RowDefinition Height="Auto" />
+					<RowDefinition Height="10" />
 					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="135" />
-					<ColumnDefinition Width="5" />
-					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition Width="2" />
-					<ColumnDefinition Width="Auto" />
-				</Grid.ColumnDefinitions>
-				<TextBlock Grid.Row="0" Grid.Column="0" Margin="3 0 0 0" FontWeight="Bold" Foreground="#666666" VerticalAlignment="Center" Text="Total" />
-				<TextBlock Grid.Row="0" Grid.Column="2" FontWeight="Bold" FontSize="14" Text="200" />
-				<TextBlock Grid.Row="1" Grid.Column="0" Margin="3 0 0 0" FontWeight="Bold" Foreground="#666666" VerticalAlignment="Center" Text="Average" />
-				<TextBlock Grid.Row="1" Grid.Column="2" FontWeight="Bold" FontSize="14" Text="200" />
-				<TextBlock Grid.Row="3" Grid.Column="0" Margin="3 0 0 0" FontWeight="Bold" Foreground="#666666" VerticalAlignment="Center" Text="Longest (all-time): " />
-				<TextBlock Grid.Row="3" Grid.Column="2" FontWeight="Bold" FontSize="14" Text="200" />
-				<TextBlock Grid.Row="3" Grid.Column="4" VerticalAlignment="Center" Text="(12/12/2020)"/>
+
+				<StackPanel Grid.Row="0">
+					<TextBlock FontWeight="Bold" Foreground="#666666" VerticalAlignment="Center" Text="Total" />
+					<TextBlock FontWeight="Bold" FontSize="14" Text="{Binding SummaryData.TotalDistanceMoved, StringFormat=N2}" />
+				</StackPanel>
+
+				<StackPanel Grid.Row="2">
+					<TextBlock FontWeight="Bold" Foreground="#666666" VerticalAlignment="Center" Text="Average" />
+					<TextBlock FontWeight="Bold" FontSize="14" Text="{Binding SummaryData.AverageDistanceMoved, StringFormat=N2}" />
+				</StackPanel>
+
+				<StackPanel Grid.Row="4" >
+					<TextBlock FontWeight="Bold" Foreground="#666666" VerticalAlignment="Center" Text="Longest (all-time): " />
+					<StackPanel Orientation="Horizontal">
+						<TextBlock FontWeight="Bold" FontSize="14" Text="{Binding SummaryData.LargestDistanceMoved, StringFormat=N2}" />
+						<TextBlock VerticalAlignment="Center" Margin="2 0 0 0" Text="{Binding SummaryData.LargestDistanceMovedDate, StringFormat='({0:d})'}"/>
+					</StackPanel>
+				</StackPanel>
+
 			</Grid>
 		</Grid>
 	</Border>

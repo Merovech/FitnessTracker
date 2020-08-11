@@ -34,16 +34,20 @@ namespace FitnessTracker
 		{
 			services.AddSingleton<MainWindowView>();
 			services.AddSingleton<WeightChartView>();
+			services.AddSingleton<MovementChartView>();
 			services.AddSingleton<RawDataView>();
 			services.AddSingleton<DebugView>();
+			services.AddSingleton<SummaryView>();
 		}
 
 		private void RegisterViewModels(IServiceCollection services)
 		{
 			services.AddSingleton<MainViewModel>();
 			services.AddSingleton<WeightChartViewModel>();
+			services.AddSingleton<MovementChartViewModel>();
 			services.AddSingleton<RawDataViewModel>();
 			services.AddSingleton<DebugViewModel>();
+			services.AddSingleton<SummaryViewModel>();
 		}
 
 		private void RegisterDatabaseContexts(IServiceCollection services)

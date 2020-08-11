@@ -28,7 +28,7 @@ namespace FitnessTracker.Services.Implementations
 
 			var dataList = data.ToList();
 			var startingWeight = dataList.FirstOrDefault().Weight;
-			var maxDistanceRecord = new DailyRecord { Id = 0, Weight = 0, DistanceMoved = double.MinValue } ;
+			var maxDistanceRecord = new DailyRecord { Id = 0, Weight = 0, DistanceMoved = double.MinValue };
 			var lowestWeightRecord = new DailyRecord { Id = 0, Weight = double.MaxValue };
 			var highestWeightRecord = new DailyRecord { Id = 0, Weight = double.MinValue };
 
@@ -71,7 +71,7 @@ namespace FitnessTracker.Services.Implementations
 				retVal.TotalDistanceMoved += distanceMoved;
 			}
 
-			retVal.TotalWeightChange = startingWeight - retVal.CurrentWeight;
+			retVal.TotalWeightChange = retVal.CurrentWeight - startingWeight;
 			retVal.LowestWeight = lowestWeightRecord.MovingWeightAverage.GetValueOrDefault();
 			retVal.LowestWeightDate = lowestWeightRecord.Date;
 			retVal.HighestWeight = highestWeightRecord.MovingWeightAverage.GetValueOrDefault();
