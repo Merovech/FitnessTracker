@@ -6,7 +6,7 @@
 		xmlns:v="clr-namespace:FitnessTracker.Views"
         mc:Ignorable="d"
 		DataContext="{Binding Source={StaticResource Locator}, Path=MainViewModel}"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="1000" Width="1600">
 	<DockPanel>
 		<Menu DockPanel.Dock="Top">
 			<MenuItem Header="_File">
@@ -20,31 +20,25 @@
 			<StatusBarItem Content="{Binding Status}" />
 		</StatusBar>
 		<v:SummaryView DockPanel.Dock="Right" />
-		<Grid>
-			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto"/>
-				<RowDefinition Height="10"/>
-				<RowDefinition />
-			</Grid.RowDefinitions>
-			<v:AddEditDataView Grid.Row="0" HorizontalAlignment="Center"/>
-			<TabControl Grid.Row="2" BorderThickness="0">
-				<TabItem Header="Home">
-					<Grid>
-						<Grid.RowDefinitions>
-							<RowDefinition />
-							<RowDefinition />
-						</Grid.RowDefinitions>
-						<v:WeightChartView Grid.Row="0"/>
-						<v:MovementChartView Grid.Row="1" />
-					</Grid>
-				</TabItem>
-				<TabItem Header="Raw Data">
-					<v:RawDataView />
-				</TabItem>
-				<TabItem Header="Debug Statistics">
-					<v:DebugView/>
-				</TabItem>
-			</TabControl>
-		</Grid>
+		<TabControl Grid.Row="2" BorderThickness="0">
+			<TabItem Header="Home">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition />
+						<RowDefinition />
+					</Grid.RowDefinitions>
+					<v:AddEditDataView Grid.Row="0" HorizontalAlignment="Center"/>
+					<v:WeightChartView Grid.Row="1"/>
+					<v:MovementChartView Grid.Row="2" />
+				</Grid>
+			</TabItem>
+			<TabItem Header="Raw Data">
+				<v:RawDataView />
+			</TabItem>
+			<TabItem Header="Debug Statistics">
+				<v:DebugView/>
+			</TabItem>
+		</TabControl>
 	</DockPanel>
 </Window>

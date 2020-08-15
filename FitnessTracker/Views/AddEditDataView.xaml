@@ -26,10 +26,34 @@
 		<TextBlock Grid.Row="0" Grid.Column="2" FontSize="10" FontWeight="Bold" Foreground="#888888" Text="Weight" />
 		<TextBlock Grid.Row="0" Grid.Column="4" FontSize="10" FontWeight="Bold" Foreground="#888888" Text="Distance" />
 
-		<DatePicker Grid.Row="1" Grid.Column="0" SelectedDateFormat="Short" />
-		<TextBox Grid.Row="1" Grid.Column="2" />
-		<TextBox Grid.Row="1" Grid.Column="4" />
-		<Button Grid.Row="1" Grid.Column="6" Visibility="{Binding IsNewDataPoint, Converter={StaticResource FalseToVisibleConverter}}" Content="Add" />
-		<Button Grid.Row="1" Grid.Column="6" Visibility="{Binding IsNewDataPoint, Converter={StaticResource TrueToVisibileConverter}}" Content="Edit" />
+		<DatePicker Grid.Row="1" Grid.Column="0" SelectedDateFormat="Short" SelectedDate="{Binding CurrentRecordDate, Mode=TwoWay}" IsEnabled="{Binding IsIdle}"/>
+		<TextBox Name="WeightInput" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding IsIdle}" Text="{Binding CurrentRecord.Weight, Mode=TwoWay}"/>
+		<TextBox Name="DistanceInput" Grid.Row="1" Grid.Column="4" IsEnabled="{Binding IsIdle}" Text="{Binding CurrentRecord.DistanceMoved, Mode=TwoWay}"/>
+		<Button 
+			Grid.Row="1" 
+			Grid.Column="6" 
+			Visibility="{Binding IsNewDataPoint, Converter={StaticResource FalseToVisibleConverter}}" 
+			Content="Edit" 
+			Command="{Binding UpsertCommand}">
+			<Button.IsEnabled>
+				<MultiBinding Converter="{StaticResource InverseCombineBooleanConverter}">
+					<Binding ElementName="WeightInput" Path="(Validation.HasError)" />
+					<Binding ElementName="DistanceInput" Path="(Validation.HasError)" />
+				</MultiBinding>
+			</Button.IsEnabled>
+		</Button>
+		<Button 
+			Grid.Row="1" 
+			Grid.Column="6" 
+			Visibility="{Binding IsNewDataPoint, Converter={StaticResource TrueToVisibileConverter}}" 
+			Content="Add" 
+			Command="{Binding UpsertCommand}">
+			<Button.IsEnabled>
+				<MultiBinding Converter="{StaticResource InverseCombineBooleanConverter}">
+					<Binding ElementName="WeightInput" Path="(Validation.HasError)" />
+					<Binding ElementName="DistanceInput" Path="(Validation.HasError)" />
+				</MultiBinding>
+			</Button.IsEnabled>
+		</Button>
 	</Grid>
 </UserControl>

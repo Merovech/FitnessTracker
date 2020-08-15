@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FitnessTracker.Models;
 using FitnessTracker.Services.Interfaces;
 using FitnessTracker.Utilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace FitnessTracker.Services.Implementations
 {
@@ -28,19 +29,21 @@ namespace FitnessTracker.Services.Implementations
 			_context.SaveChanges();
 		}
 
-		public void Add(DailyRecord record)
+		public async Task Add(DailyRecord record)
 		{
-			throw new NotImplementedException();
+			_context.Records.Add(record);
+			await _context.SaveChangesAsync();
 		}
 
-		public DailyRecord Get(DateTime recordDate)
+		public async Task<DailyRecord> Get(DateTime recordDate)
 		{
-			throw new NotImplementedException();
+			return await Task.Run(() => _context.Records.Where(r => r.Date == recordDate).FirstOrDefault());
 		}
 
 		public async Task<IEnumerable<DailyRecord>> GetAll()
 		{
-			var rawData = await Task.Run(() =>_context.Records.OrderBy(item => item.Date).ToList());
+			var rawData = await _context.Records.AsNoTracking().ToListAsync();
+			rawData = rawData.OrderBy(item => item.Date).ToList();
 			_dataCalculatorService.FillCalculatedDataFields(rawData);
 			return rawData;
 		}
@@ -60,9 +63,10 @@ namespace FitnessTracker.Services.Implementations
 			throw new NotImplementedException();
 		}
 
-		public void Update(DailyRecord record)
+		public async Task Update(DailyRecord record)
 		{
-			throw new NotImplementedException();
+			_context.Update(record);
+			await _context.SaveChangesAsync();
 		}
 	}
 }

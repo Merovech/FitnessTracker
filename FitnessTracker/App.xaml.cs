@@ -55,7 +55,7 @@ namespace FitnessTracker
 
 		private void RegisterDatabaseContexts(IServiceCollection services)
 		{
-			services.AddDbContext<DatabaseContext>();
+			services.AddTransient<DatabaseContext>();
 		}
 
 		private void RegisterServices(IServiceCollection services)

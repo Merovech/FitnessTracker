@@ -35,7 +35,7 @@ namespace FitnessTracker.ViewModels
 		private async Task ImportAsync()
 		{
 			Status = "Importing data...";
-			await _importerService.ImportData(@"c:\users\ariro\desktop\importdata.csv");
+			await _importerService.ImportData("importdata.csv");
 			MessengerInstance.Send(new NewDataAvailableMessage());
 
 			Status = "";

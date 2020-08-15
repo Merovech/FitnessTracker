@@ -29,8 +29,8 @@ namespace FitnessTracker.Services.Implementations
 			var dataList = data.ToList();
 			var startingWeight = dataList.FirstOrDefault().Weight;
 			var maxDistanceRecord = new DailyRecord { Id = 0, Weight = 0, DistanceMoved = double.MinValue };
-			var lowestWeightRecord = new DailyRecord { Id = 0, Weight = double.MaxValue };
-			var highestWeightRecord = new DailyRecord { Id = 0, Weight = double.MinValue };
+			var lowestWeightRecord = new DailyRecord { Id = 0, Weight = 0, MovingWeightAverage = double.MaxValue };
+			var highestWeightRecord = new DailyRecord { Id = 0, Weight = 0, MovingWeightAverage = double.MinValue };
 
 			for (int i = 0; i < dataList.Count; i++)
 			{
@@ -41,12 +41,12 @@ namespace FitnessTracker.Services.Implementations
 					maxDistanceRecord = item;
 				}
 
-				if (item.MovingWeightAverage < lowestWeightRecord.Weight)
+				if (item.MovingWeightAverage < lowestWeightRecord.MovingWeightAverage)
 				{
 					lowestWeightRecord = item;
 				}
 
-				if (item.MovingWeightAverage > highestWeightRecord.Weight)
+				if (item.MovingWeightAverage > highestWeightRecord.MovingWeightAverage)
 				{
 					highestWeightRecord = item;
 				}

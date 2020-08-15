@@ -20,6 +20,7 @@ namespace FitnessTracker.Converters
 		}
 
 		public T True { get; set; }
+
 		public T False { get; set; }
 
 		public virtual object Convert(object value, Type targetType, object parameter, CultureInfo culture)
