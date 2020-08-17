@@ -17,10 +17,8 @@ namespace FitnessTracker.Services.Interfaces
 
 		Task<IEnumerable<DailyRecord>> GetAll();
 
-		Task Add(DailyRecord record);
+		Task Upsert(DateTime date, double weight, double? distance);
 
 		Task BulkAddAsync(IEnumerable<DailyRecord> records);
-
-		Task Update(DailyRecord record);
 	}
 }

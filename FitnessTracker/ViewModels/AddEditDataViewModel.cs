@@ -16,7 +16,9 @@ namespace FitnessTracker.ViewModels
 		private readonly IDatabaseService _databaseService;
 
 		private bool _isIdle;
-		private DailyRecord _currentRecord;
+		private DateTime _date;
+		private double _weight;
+		private double? _distance;
 
 		public AddEditDataViewModel(IDatabaseService databaseService)
 		{
@@ -25,16 +27,33 @@ namespace FitnessTracker.ViewModels
 
 			UpsertCommand = new RelayCommand(async () => await Upsert());
 
-			CurrentRecord = new DailyRecord { Id = 0, Date = DateTime.Today };
+			_date = DateTime.Today;
 
 			Task.Run(async () => await RetrieveRecord());
 		}
 
 		public RelayCommand UpsertCommand { get; set; }
 
-		public bool IsNewDataPoint
+		public DateTime Date
 		{
-			get => CurrentRecord?.Id == 0;
+			get => _date;
+			set
+			{
+				Set(nameof(Date), ref _date, value);
+				Task.Run(async () => await RetrieveRecord());
+			}
+		}
+
+		public double Weight
+		{
+			get => _weight;
+			set => Set(nameof(Weight), ref _weight, value);
+		}
+
+		public double? Distance
+		{
+			get => _distance;
+			set => Set(nameof(Weight), ref _distance, value);
 		}
 
 		public bool IsIdle
@@ -43,52 +62,22 @@ namespace FitnessTracker.ViewModels
 			set => Set(nameof(IsIdle), ref _isIdle, value);
 		}
 
-		public DailyRecord CurrentRecord
-		{
-			get => _currentRecord;
-			set
-			{
-				_currentRecord = value;
-				RaisePropertyChanged(nameof(IsNewDataPoint));
-				RaisePropertyChanged(nameof(CurrentRecord));
-			}
-		}
-
-		public DateTime CurrentRecordDate
-		{
-			get => CurrentRecord.Date;
-			set
-			{
-				CurrentRecord.Date = value;
-				RaisePropertyChanged(nameof(CurrentRecordDate));
-				Task.Run(async () => await RetrieveRecord());
-			}
-		}
-
 		private async Task RetrieveRecord()
 		{
 			IsIdle = false;
-			var record = await _databaseService.Get(CurrentRecordDate.Date);
-			if (record == null)
+			var record = await _databaseService.Get(_date);
+			if (record != null)
 			{
-				record = new DailyRecord { Date = CurrentRecord.Date };
+				Weight = record.Weight;
+				Distance = record.DistanceMoved;
 			}
 
-			CurrentRecord = record;
 			IsIdle = true;
 		}
 
 		private async Task Upsert()
 		{
-			if (IsNewDataPoint)
-			{
-				await _databaseService.Add(CurrentRecord);
-			}
-			else
-			{
-				await _databaseService.Update(CurrentRecord);
-			}
-
+			await _databaseService.Upsert(Date, Weight, Distance);
 			MessengerInstance.Send(new NewDataAvailableMessage());
 		}
 	}

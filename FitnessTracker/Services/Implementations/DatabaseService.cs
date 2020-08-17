@@ -29,9 +29,21 @@ namespace FitnessTracker.Services.Implementations
 			_context.SaveChanges();
 		}
 
-		public async Task Add(DailyRecord record)
+		public async Task Upsert(DateTime date, double weight, double? distance)
 		{
-			_context.Records.Add(record);
+			var existingRecord = await _context.Records.FirstOrDefaultAsync(x => x.Date == date);
+			if (existingRecord == null)
+			{
+				_context.Records.Add(new DailyRecord { Date = date, Weight = weight, DistanceMoved = distance });
+			}
+			else
+			{
+				var entry = _context.Entry(existingRecord);
+				entry.Entity.Weight = weight;
+				entry.Entity.DistanceMoved = distance;
+				entry.State = EntityState.Modified;
+			}
+
 			await _context.SaveChangesAsync();
 		}
 
@@ -61,12 +73,6 @@ namespace FitnessTracker.Services.Implementations
 		public IEnumerable<DailyRecord> GetTo(DateTime endDate)
 		{
 			throw new NotImplementedException();
-		}
-
-		public async Task Update(DailyRecord record)
-		{
-			_context.Update(record);
-			await _context.SaveChangesAsync();
 		}
 	}
 }
