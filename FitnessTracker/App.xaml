@@ -1,11 +1,9 @@
 ﻿<Application x:Class="FitnessTracker.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:FitnessTracker"
-             xmlns:vm="clr-namespace:FitnessTracker.ViewModels"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:u="clr-namespace:FitnessTracker.Utilities"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:c="clr-namespace:FitnessTracker.Converters"
+             xmlns:u="clr-namespace:FitnessTracker.Utilities"
              StartupUri="views\MainWindowView.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -16,17 +14,8 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
             </ResourceDictionary.MergedDictionaries>
             
-            <!-- Uncomment to see the project compile, but fail due to a missing MaterialDesignThemes.Wpf.dll file -->
-            <!--<ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
-            </ResourceDictionary.MergedDictionaries>-->
-            
             <u:ViewModelLocator x:Key="Locator" />
             <c:SharedValueConverter x:Key="SharedConverter" />
-            <c:BooleanToVisibilityConverter x:Key="TrueToVisibileConverter" True="Visible" False="Collapsed" />
-            <c:BooleanToVisibilityConverter x:Key="FalseToVisibleConverter" True="Collapsed" False="Visible" />
             <c:InverseCombineAndBooleansConverter x:Key="InverseCombineBooleanConverter" />
         </ResourceDictionary>
     </Application.Resources>
