@@ -36,29 +36,34 @@ namespace FitnessTracker
 			var assembly = this.GetType().Assembly;
 			var types = assembly.GetTypes();
 
-			// Build a dictionary of each type we need
-			var mappings = new Dictionary<Type, Type>();
-			var dataContexts = types.Where(t => t.IsSubclassOf(typeof(DbContext)));
-			var serviceInterfaces = types.Where(t => t.IsInterface && t.Name.EndsWith("Service")).OrderBy(t => t.Name).ToList();
-			var serviceImplementations = types.Where(t => !t.IsInterface && t.Name.EndsWith("Service")).OrderBy(t => t.Name).ToList();
-			var viewModels = types.Where(t => t.Name.EndsWith("ViewModel"));
+			var serviceInterfaces = new List<Type>();
+			var serviceImplementations = new List<Type>();
 
 			// MainViewModel is a special case, as it's the entry point for the app
 			var mainViewModel = types.FirstOrDefault(t => t.Name == nameof(MainWindowView));
 			serviceCollection.AddSingleton(mainViewModel);
 
-			RegisterDataContexts(serviceCollection, dataContexts);
-			RegisterServices(serviceCollection, serviceInterfaces, serviceImplementations);
-			RegisterViewModels(serviceCollection, viewModels);
-		}
-
-		private void RegisterDataContexts(IServiceCollection serviceCollection, IEnumerable<Type> dataContextTypes)
-		{
-			foreach (var dc in dataContextTypes)
+			foreach (var t in types)
 			{
-				Debug.WriteLine($"Registering data context: {dc.Name}");
-				serviceCollection.AddTransient(dc);
+				if (t.IsSubclassOf(typeof(DbContext)) || t.Name.EndsWith("ViewModel"))
+				{
+					// Register VMs and DbContexts straightaway.  No further processing needed.
+					Debug.WriteLine($"Registering type: {t.Name}");
+					serviceCollection.AddTransient(t);
+				}
+				else if (t.IsInterface && t.Name.EndsWith("Service"))
+				{
+					serviceInterfaces.Add(t);
+				}
+				else if (!t.IsInterface && t.Name.EndsWith("Service"))
+				{
+					serviceImplementations.Add(t);
+				}
+
+				// Ignore the rest of the types in the assembly
 			}
+
+			RegisterServices(serviceCollection, serviceInterfaces.OrderBy(t => t.Name).ToList(), serviceImplementations.OrderBy(t => t.Name).ToList());
 		}
 
 		private void RegisterServices(IServiceCollection serviceCollection, List<Type> interfaces, List<Type> implementations)
@@ -69,15 +74,6 @@ namespace FitnessTracker
 			{
 				Debug.WriteLine($"Registering service: {interfaces[i].Name}, {implementations[i].Name}");
 				serviceCollection.AddTransient(interfaces[i], implementations[i]);
-			}
-		}
-
-		private void RegisterViewModels(IServiceCollection serviceCollection, IEnumerable<Type> viewModels)
-		{
-			foreach (var vm in viewModels)
-			{
-				Debug.WriteLine($"Registering view model: {vm.Name}");
-				serviceCollection.AddSingleton(vm);
 			}
 		}
 	}
