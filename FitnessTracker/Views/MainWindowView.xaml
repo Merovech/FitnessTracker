@@ -23,30 +23,35 @@
 				<MenuItem Header="E_xit" Click="OnExit"/>
 			</MenuItem>
 		</Menu>
-		<StatusBar DockPanel.Dock="Bottom">
-			<StatusBarItem Content="Status:" />
-			<StatusBarItem Content="{Binding Status}" />
-		</StatusBar>
 		<v:SummaryView DockPanel.Dock="Right" />
-		<TabControl Grid.Row="2" BorderThickness="0">
-			<TabItem Header="Home">
-				<Grid>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto" />
-						<RowDefinition />
-						<RowDefinition />
-					</Grid.RowDefinitions>
-					<v:AddEditDataView Grid.Row="0" HorizontalAlignment="Center"/>
-					<v:WeightChartView Grid.Row="1"/>
-					<v:MovementChartView Grid.Row="2" />
+		<Grid Grid.Row="2">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="38"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+			<materialDesign:ColorZone Mode="PrimaryDark" Padding="0">
+				<StackPanel Orientation="Horizontal" Margin="2 2 2 -4">
+					<RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" x:Name="rbTab1" Margin="4" IsChecked="True" Content="HOME"/>
+					<RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" x:Name="rbTab2" Margin="4" Content="RAW DATA"/>
+				</StackPanel>
+			</materialDesign:ColorZone>
+			<Grid Grid.Row="1">
+				<Grid Visibility="{Binding IsChecked, ElementName=rbTab1, Converter={StaticResource BooleanToVisibilityConverter}}">
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="50" />
+							<RowDefinition />
+							<RowDefinition />
+						</Grid.RowDefinitions>
+						<v:AddEditDataView Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+						<v:WeightChartView Grid.Row="1"/>
+						<v:MovementChartView Grid.Row="2" />
+					</Grid>
 				</Grid>
-			</TabItem>
-			<TabItem Header="Raw Data">
-				<v:RawDataView />
-			</TabItem>
-			<TabItem Header="Debug Statistics">
-				<v:DebugView/>
-			</TabItem>
-		</TabControl>
+				<Grid Visibility="{Binding IsChecked, ElementName=rbTab2, Converter={StaticResource BooleanToVisibilityConverter}}">
+					<v:RawDataView />
+				</Grid>
+			</Grid>
+		</Grid>
 	</DockPanel>
 </Window>

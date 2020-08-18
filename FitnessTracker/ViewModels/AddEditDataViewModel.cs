@@ -53,7 +53,7 @@ namespace FitnessTracker.ViewModels
 		public double? Distance
 		{
 			get => _distance;
-			set => Set(nameof(Weight), ref _distance, value);
+			set => Set(nameof(Distance), ref _distance, value);
 		}
 
 		public bool IsIdle
@@ -66,11 +66,8 @@ namespace FitnessTracker.ViewModels
 		{
 			IsIdle = false;
 			var record = await _databaseService.Get(_date);
-			if (record != null)
-			{
-				Weight = record.Weight;
-				Distance = record.DistanceMoved;
-			}
+			Weight = record == null ? 0 : record.Weight;
+			Distance = record?.DistanceMoved;
 
 			IsIdle = true;
 		}

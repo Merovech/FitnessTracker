@@ -11,8 +11,6 @@ namespace FitnessTracker.ViewModels
 	{
 		private readonly IDataImporterService _importerService;
 
-		private string _status;
-
 		public MainViewModel(IDataImporterService importerService)
 		{
 			Guard.AgainstNull(importerService, nameof(importerService));
@@ -26,19 +24,10 @@ namespace FitnessTracker.ViewModels
 		public RelayCommand ImportCommand { get; }
 		public RelayCommand ExitCommand { get; }
 
-		public string Status
-		{
-			get => _status;
-			set => Set(ref _status, value);
-		}
-
 		private async Task ImportAsync()
 		{
-			Status = "Importing data...";
 			await _importerService.ImportData("importdata.csv");
 			MessengerInstance.Send(new NewDataAvailableMessage());
-
-			Status = "";
 		}
 	}
 }
