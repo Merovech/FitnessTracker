@@ -57,6 +57,7 @@ namespace FitnessTracker
 			services.AddTransient<IDataImporterService, DataImporterService>();
 			services.AddTransient<IDataCalculatorService, DataCalculatorService>();
 			services.AddTransient<IFileDialogService, FileDialogService>();
+			services.AddTransient<IConfigurationService, ConfigurationService>();
 		}
 
 		private void OnStartup(object sender, StartupEventArgs e)
