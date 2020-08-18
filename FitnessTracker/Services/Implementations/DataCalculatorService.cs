@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using FitnessTracker.Models;
 using FitnessTracker.Services.Interfaces;
-using FitnessTracker.Utilities;
 
 namespace FitnessTracker.Services.Implementations
 {
