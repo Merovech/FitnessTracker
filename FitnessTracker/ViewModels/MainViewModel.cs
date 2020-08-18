@@ -10,15 +10,19 @@ namespace FitnessTracker.ViewModels
 	public class MainViewModel : ViewModelBase
 	{
 		private readonly IDataImporterService _importerService;
+		private readonly IFileDialogService _fileDialogService;
 
-		public MainViewModel(IDataImporterService importerService)
+		private const string IMPORT_FILE_FILTER = "Comma-Separated Files|*.csv";
+
+		public MainViewModel(IDataImporterService importerService, IFileDialogService fileDialogService)
 		{
 			Guard.AgainstNull(importerService, nameof(importerService));
+			Guard.AgainstNull(fileDialogService, nameof(fileDialogService));
 
 			_importerService = importerService;
-			ImportCommand = new RelayCommand(async () => await ImportAsync());
+			_fileDialogService = fileDialogService;
 
-			_ = ImportAsync();
+			ImportCommand = new RelayCommand(async () => await ImportAsync());
 		}
 
 		public RelayCommand ImportCommand { get; }
@@ -26,8 +30,12 @@ namespace FitnessTracker.ViewModels
 
 		private async Task ImportAsync()
 		{
-			await _importerService.ImportData("importdata.csv");
-			MessengerInstance.Send(new NewDataAvailableMessage());
+			var filePath = _fileDialogService.OpenFileDialog(IMPORT_FILE_FILTER);
+			if (!string.IsNullOrEmpty(filePath))
+			{
+				await _importerService.ImportData("importdata.csv");
+				MessengerInstance.Send(new NewDataAvailableMessage());
+			}
 		}
 	}
 }
