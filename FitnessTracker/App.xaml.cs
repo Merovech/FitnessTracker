@@ -1,9 +1,10 @@
-﻿using System.Windows;
-using FitnessTracker.Models;
-using FitnessTracker.Services.Implementations;
-using FitnessTracker.Services.Interfaces;
-using FitnessTracker.ViewModels;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Windows;
 using FitnessTracker.Views;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FitnessTracker
@@ -18,46 +19,8 @@ namespace FitnessTracker
 		public App()
 		{
 			var serviceCollection = new ServiceCollection();
-			ConfigureServices(serviceCollection);
+			RegisterInjectables(serviceCollection);
 			ServiceProvider = serviceCollection.BuildServiceProvider();
-		}
-
-		private void ConfigureServices(IServiceCollection services)
-		{
-			// TODO: Reflection to load this using naming conventions
-			RegisterViews(services);
-			RegisterViewModels(services);
-			RegisterDatabaseContexts(services);
-			RegisterServices(services);
-		}
-
-		private void RegisterViews(IServiceCollection services)
-		{
-			services.AddSingleton<MainWindowView>();
-		}
-
-		private void RegisterViewModels(IServiceCollection services)
-		{
-			services.AddSingleton<MainViewModel>();
-			services.AddSingleton<WeightChartViewModel>();
-			services.AddSingleton<MovementChartViewModel>();
-			services.AddSingleton<RawDataViewModel>();
-			services.AddSingleton<SummaryViewModel>();
-			services.AddSingleton<AddEditDataViewModel>();
-		}
-
-		private void RegisterDatabaseContexts(IServiceCollection services)
-		{
-			services.AddTransient<DatabaseContext>();
-		}
-
-		private void RegisterServices(IServiceCollection services)
-		{
-			services.AddTransient<IDatabaseService, DatabaseService>();
-			services.AddTransient<IDataImporterService, DataImporterService>();
-			services.AddTransient<IDataCalculatorService, DataCalculatorService>();
-			services.AddTransient<IFileDialogService, FileDialogService>();
-			services.AddTransient<IConfigurationService, ConfigurationService>();
 		}
 
 		private void OnStartup(object sender, StartupEventArgs e)
@@ -66,6 +29,56 @@ namespace FitnessTracker
 			mainWindow.Show();
 
 			base.OnStartup(e);
+		}
+
+		private void RegisterInjectables(IServiceCollection serviceCollection)
+		{
+			var assembly = this.GetType().Assembly;
+			var types = assembly.GetTypes();
+
+			// Build a dictionary of each type we need
+			var mappings = new Dictionary<Type, Type>();
+			var dataContexts = types.Where(t => t.IsSubclassOf(typeof(DbContext)));
+			var serviceInterfaces = types.Where(t => t.IsInterface && t.Name.EndsWith("Service")).OrderBy(t => t.Name).ToList();
+			var serviceImplementations = types.Where(t => !t.IsInterface && t.Name.EndsWith("Service")).OrderBy(t => t.Name).ToList();
+			var viewModels = types.Where(t => t.Name.EndsWith("ViewModel"));
+
+			// MainViewModel is a special case, as it's the entry point for the app
+			var mainViewModel = types.FirstOrDefault(t => t.Name == nameof(MainWindowView));
+			serviceCollection.AddSingleton(mainViewModel);
+
+			RegisterDataContexts(serviceCollection, dataContexts);
+			RegisterServices(serviceCollection, serviceInterfaces, serviceImplementations);
+			RegisterViewModels(serviceCollection, viewModels);
+		}
+
+		private void RegisterDataContexts(IServiceCollection serviceCollection, IEnumerable<Type> dataContextTypes)
+		{
+			foreach (var dc in dataContextTypes)
+			{
+				Debug.WriteLine($"Registering data context: {dc.Name}");
+				serviceCollection.AddTransient(dc);
+			}
+		}
+
+		private void RegisterServices(IServiceCollection serviceCollection, List<Type> interfaces, List<Type> implementations)
+		{
+			// We're cheating here and taking advantage of the fact that every service has a corresponding interface.  So if
+			// we take a sorted list of services implementations and a sorted list of service interfaces, they'll match up.
+			for (int i = 0; i < interfaces.Count; i++)
+			{
+				Debug.WriteLine($"Registering service: {interfaces[i].Name}, {implementations[i].Name}");
+				serviceCollection.AddTransient(interfaces[i], implementations[i]);
+			}
+		}
+
+		private void RegisterViewModels(IServiceCollection serviceCollection, IEnumerable<Type> viewModels)
+		{
+			foreach (var vm in viewModels)
+			{
+				Debug.WriteLine($"Registering view model: {vm.Name}");
+				serviceCollection.AddSingleton(vm);
+			}
 		}
 	}
 }
