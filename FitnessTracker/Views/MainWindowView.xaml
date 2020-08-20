@@ -16,42 +16,54 @@
         DataContext="{Binding Source={StaticResource Locator}, Path=MainViewModel}"
         Title="MainWindow" Height="1000" Width="1600">
 	<DockPanel>
-		<Menu DockPanel.Dock="Top">
-			<MenuItem Header="_File">
-				<MenuItem Header="_Import" Command="{Binding ImportCommand}"/>
-				<Separator />
-				<MenuItem Header="E_xit" Click="OnExit"/>
-			</MenuItem>
-		</Menu>
 		<v:SummaryView DockPanel.Dock="Right" />
+		
 		<Grid Grid.Row="2">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="38"/>
 				<RowDefinition Height="*"/>
-			</Grid.RowDefinitions>
-			<materialDesign:ColorZone Mode="PrimaryDark" Padding="0">
-				<StackPanel Orientation="Horizontal" Margin="2 2 2 -4">
-					<RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" x:Name="rbTab1" Margin="4" IsChecked="True" Content="HOME"/>
-					<RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" x:Name="rbTab2" Margin="4" Content="RAW DATA"/>
-				</StackPanel>
-			</materialDesign:ColorZone>
-			<Grid Grid.Row="1">
-				<Grid Visibility="{Binding IsChecked, ElementName=rbTab1, Converter={StaticResource BooleanToVisibilityConverter}}">
-					<Grid>
-						<Grid.RowDefinitions>
-							<RowDefinition Height="50" />
-							<RowDefinition />
-							<RowDefinition />
-						</Grid.RowDefinitions>
-						<v:AddEditDataView Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<v:WeightChartView Grid.Row="1"/>
-						<v:MovementChartView Grid.Row="2" />
+					</Grid.RowDefinitions>
+					<materialDesign:ColorZone Mode="PrimaryDark" Padding="0">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+								<ColumnDefinition Width="Auto" />
+							</Grid.ColumnDefinitions>
+							<StackPanel Orientation="Horizontal" Grid.Column="0" Margin="2 2 2 -4">
+								<RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" x:Name="rbTab1" Margin="4" IsChecked="True" Content="HOME"/>
+								<RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" x:Name="rbTab2" Margin="4" Content="RAW DATA"/>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal" Grid.Column="1">
+								<Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ImportCommand}" Foreground="{DynamicResource MaterialDesignDarkForeground}" Padding="0" ToolTip="Import Data">
+									<Button.Content>
+										<materialDesign:PackIcon Kind="Import" Height="32" Width="32"/>
+									</Button.Content>
+								</Button>
+								<Button Style="{StaticResource MaterialDesignFlatButton}" Foreground="{DynamicResource MaterialDesignDarkForeground}" Margin="0 0 5 0" Padding="0" ToolTip="Settings">
+									<Button.Content>
+										<materialDesign:PackIcon Kind="CogOutline" Height="32" Width="32"/>
+									</Button.Content>
+								</Button>
+							</StackPanel>
+						</Grid>
+					</materialDesign:ColorZone>
+					<Grid Grid.Row="1">
+						<Grid Visibility="{Binding IsChecked, ElementName=rbTab1, Converter={StaticResource BooleanToVisibilityConverter}}">
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="50" />
+									<RowDefinition />
+									<RowDefinition />
+								</Grid.RowDefinitions>
+								<v:AddEditDataView Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+								<v:WeightChartView Grid.Row="1"/>
+								<v:MovementChartView Grid.Row="2" />
+							</Grid>
+						</Grid>
+						<Grid Visibility="{Binding IsChecked, ElementName=rbTab2, Converter={StaticResource BooleanToVisibilityConverter}}">
+							<v:RawDataView />
+						</Grid>
 					</Grid>
-				</Grid>
-				<Grid Visibility="{Binding IsChecked, ElementName=rbTab2, Converter={StaticResource BooleanToVisibilityConverter}}">
-					<v:RawDataView />
-				</Grid>
-			</Grid>
-		</Grid>
+					</Grid>
 	</DockPanel>
 </Window>

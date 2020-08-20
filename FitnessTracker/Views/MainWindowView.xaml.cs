@@ -11,10 +11,5 @@ namespace FitnessTracker.Views
 		{
 			InitializeComponent();
 		}
-
-		private void OnExit(object sender, RoutedEventArgs e)
-		{
-			Application.Current.Shutdown();
-		}
 	}
 }
