@@ -1,0 +1,8 @@
+{
+  "weightUnit": "Pounds",
+  "distanceUnit": "Miles",
+  "weightGraphMinimum": 200,
+  "weightGraphMaximum": null,
+  "distanceGraphMinimum": null,
+  "distanceGraphMaximum": null
+}

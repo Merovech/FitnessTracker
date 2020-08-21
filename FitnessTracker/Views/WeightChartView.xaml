@@ -19,7 +19,7 @@
 				<v:CustomTooltip />
 			</lvc:CartesianChart.DataTooltip>
 			<lvc:CartesianChart.AxisY>
-				<lvc:Axis MinValue="200" />
+				<lvc:Axis MinValue="{Binding SystemSettings.WeightGraphMinimum}" MaxValue="{Binding SystemSettings.WeightGraphMaximum}"/>
 			</lvc:CartesianChart.AxisY>
 			<lvc:CartesianChart.AxisX>
 				<lvc:Axis Title="Date" LabelFormatter="{Binding Formatter}" >

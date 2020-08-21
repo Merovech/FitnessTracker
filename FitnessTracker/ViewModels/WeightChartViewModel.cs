@@ -4,6 +4,8 @@ using System.Linq;
 using System.Windows.Media;
 using FitnessTracker.Messages;
 using FitnessTracker.Models;
+using FitnessTracker.Services.Interfaces;
+using FitnessTracker.Utilities;
 using GalaSoft.MvvmLight;
 using LiveCharts;
 using LiveCharts.Configurations;
@@ -13,17 +15,32 @@ namespace FitnessTracker.ViewModels
 {
 	public class WeightChartViewModel : ViewModelBase
 	{
+		private readonly ISettingsService _settingsService;
+
 		private LineSeries _currentWeightSeries;
 		private LineSeries _averageWeightSeries;
+		private SystemSettings _systemSettings;
 
-		public WeightChartViewModel()
+		public WeightChartViewModel(ISettingsService settingsService)
 		{
+			Guard.AgainstNull(settingsService, nameof(settingsService));
+			_settingsService = settingsService;
+
 			InitializeWeightSeries();
 
 			MessengerInstance.Register<DataRetrievedMessage>(this, msg => UpdateData(msg.Content.ToList()));
+			MessengerInstance.Register<SystemSettingsChangedMessage>(this, msg => SystemSettings = msg.Content);
+
+			SystemSettings = _settingsService.ReadSettings();
 		}
 
 		public SeriesCollection SeriesData { get; private set; }
+
+		public SystemSettings SystemSettings
+		{
+			get =>_systemSettings ?? new SystemSettings();
+			set => Set(nameof(SystemSettings), ref _systemSettings, value);
+		}
 
 		public Func<double, string> Formatter { get; set; }
 

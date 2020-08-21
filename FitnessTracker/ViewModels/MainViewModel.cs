@@ -11,21 +11,25 @@ namespace FitnessTracker.ViewModels
 	{
 		private readonly IDataImporterService _importerService;
 		private readonly IFileDialogService _fileDialogService;
+		private readonly ISettingsService _settingsService;
 
 		private const string IMPORT_FILE_FILTER = "Comma-Separated Files|*.csv";
 
-		public MainViewModel(IDataImporterService importerService, IFileDialogService fileDialogService)
+		public MainViewModel(IDataImporterService importerService, IFileDialogService fileDialogService, ISettingsService settingsService)
 		{
 			Guard.AgainstNull(importerService, nameof(importerService));
 			Guard.AgainstNull(fileDialogService, nameof(fileDialogService));
+			Guard.AgainstNull(settingsService, nameof(settingsService));
 
 			_importerService = importerService;
 			_fileDialogService = fileDialogService;
+			_settingsService = settingsService;
 
 			ImportCommand = new RelayCommand(async () => await ImportAsync());
 		}
 
 		public RelayCommand ImportCommand { get; }
+
 		public RelayCommand ExitCommand { get; }
 
 		private async Task ImportAsync()
