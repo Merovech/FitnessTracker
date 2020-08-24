@@ -4,6 +4,8 @@ using System.Linq;
 using System.Windows.Media;
 using FitnessTracker.Messages;
 using FitnessTracker.Models;
+using FitnessTracker.Services.Interfaces;
+using FitnessTracker.Utilities;
 using GalaSoft.MvvmLight;
 using LiveCharts;
 using LiveCharts.Configurations;
@@ -13,14 +15,31 @@ namespace FitnessTracker.ViewModels
 {
 	public class MovementChartViewModel : ViewModelBase
 	{
+		private readonly ISettingsService _settingsService;
 		private LineSeries _currentWeightSeries;
 		private LineSeries _averageWeightSeries;
+		private SystemSettings _systemSettings;
 
-		public MovementChartViewModel()
+		public MovementChartViewModel(ISettingsService settingsService)
 		{
+			Guard.AgainstNull(settingsService, nameof(settingsService));
+			_settingsService = settingsService;
+
 			InitializeWeightSeries();
 
 			MessengerInstance.Register<DataRetrievedMessage>(this, msg => UpdateData(msg.Content.ToList()));
+			MessengerInstance.Register<SystemSettingsChangedMessage>(this, msg => SystemSettings = msg.Content);
+
+			// Due to weirdness in how the views are initially instantiated, we need to retrieve the settings once here.
+			// Otherwise, the settings view model seems to instantiate, retrieve settings, and send out its message before
+			// this view model exists to retrieve the message.
+			SystemSettings = _settingsService.ReadSettings();
+		}
+
+		public SystemSettings SystemSettings
+		{
+			get => _systemSettings ?? new SystemSettings();
+			set => Set(nameof(SystemSettings), ref _systemSettings, value);
 		}
 
 		public SeriesCollection SeriesData { get; private set; }

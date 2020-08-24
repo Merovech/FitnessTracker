@@ -29,7 +29,7 @@
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto" />
 						<ColumnDefinition Width="5" />
-						<ColumnDefinition Width="75" />
+						<ColumnDefinition Width="80" />
 					</Grid.ColumnDefinitions>
 					<TextBlock Grid.Column="0" 
 							   Grid.Row="0" 
@@ -101,7 +101,7 @@
 					<TextBlock Grid.Column="0" 
 							   Grid.Row="2" 
 							   VerticalAlignment="Center">
-						Specify my own minimum value.
+						Specify my own maximum value.
 					</TextBlock>
 					<ToggleButton Grid.Column="2" 
 								  Grid.Row="2" 
@@ -141,7 +141,7 @@
 					<TextBlock Grid.Column="0" 
 							   Grid.Row="6" 
 							   VerticalAlignment="Center">
-						Specify my own minimum value.
+						Specify my own maximum value.
 					</TextBlock>
 					<ToggleButton Grid.Column="2" 
 								  Grid.Row="6" 
@@ -158,11 +158,13 @@
 			<StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Center">
 				<Button IsDefault="True" 
 						Style="{DynamicResource MaterialDesignFlatButton}"
+						Command="{Binding SaveCommand}"
 						Content="SAVE" />
 				<Button IsCancel="True" 
 						Style="{DynamicResource MaterialDesignFlatButton}" 
 						Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" 
-						Margin="8 0 0 0" Content="CANCEL" />
+						Margin="8 0 0 0" 
+						Content="CANCEL" />
 			</StackPanel>
 		</Grid>
 	</Border>

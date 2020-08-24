@@ -31,6 +31,9 @@ namespace FitnessTracker.ViewModels
 			MessengerInstance.Register<DataRetrievedMessage>(this, msg => UpdateData(msg.Content.ToList()));
 			MessengerInstance.Register<SystemSettingsChangedMessage>(this, msg => SystemSettings = msg.Content);
 
+			// Due to weirdness in how the views are initially instantiated, we need to retrieve the settings once here.
+			// Otherwise, the settings view model seems to instantiate, retrieve settings, and send out its message before
+			// this view model exists to retrieve the message.
 			SystemSettings = _settingsService.ReadSettings();
 		}
 

@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:m="clr-namespace:FitnessTracker.Models"
              mc:Ignorable="d" 
 			 Width="175"
 			 DataContext="{Binding Source={StaticResource Locator}, Path=SummaryViewModel}">
@@ -16,7 +17,7 @@
 				<RowDefinition Height="0.5*" />
 			</Grid.RowDefinitions>
 			<Border Grid.Row="0" Padding="3" Background="{DynamicResource PrimaryHueMidBrush}">
-				<TextBlock FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}">Weight (lbs)</TextBlock>
+				<TextBlock FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding SystemSettings.WeightUnit, StringFormat='Weight ({0})', FallbackValue={x:Static m:WeightUnit.Pounds}}" />
 			</Border>
 			<Grid Grid.Row="1" Margin="3 0 0 0">
 				<Grid.RowDefinitions>
@@ -32,7 +33,11 @@
 				</Grid.RowDefinitions>
 
 				<StackPanel Grid.Row="0">
-					<TextBlock FontWeight="Bold" Foreground="{DynamicResource SecondaryHueLightBrush}" Text="Current" />
+					<StackPanel Orientation="Horizontal">
+						<TextBlock FontWeight="Bold" Foreground="{DynamicResource SecondaryHueLightBrush}" Text="Current" />
+						<TextBlock Foreground="{DynamicResource SecondaryHueLightBrush}" Margin="5 0 0 0" FontSize="10" VerticalAlignment="Center">(based on 5-day average)</TextBlock>
+					</StackPanel>
+					
 					<TextBlock FontWeight="Bold" FontSize="14" Text="{Binding SummaryData.CurrentWeight, StringFormat=N1}" />
 				</StackPanel>
 
@@ -63,7 +68,7 @@
 				</StackPanel>
 			</Grid>
 			<Border Grid.Row="3" Padding="3" Background="{DynamicResource PrimaryHueMidBrush}">
-				<TextBlock FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}">Distance (mi)</TextBlock>
+				<TextBlock FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding SystemSettings.DistanceUnit, StringFormat='Distance ({0})', FallbackValue={x:Static m:DistanceUnit.Miles}}" />
 			</Border>
 			<Grid Grid.Row="4" Margin="3 0 0 0" >
 				<Grid.RowDefinitions>
@@ -91,7 +96,6 @@
 						<TextBlock VerticalAlignment="Center" Margin="2 0 0 0" Text="{Binding SummaryData.LargestDistanceMovedDate, StringFormat='({0:d})'}"/>
 					</StackPanel>
 				</StackPanel>
-
 			</Grid>
 		</Grid>
 	</Border>

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using FitnessTracker.Messages;
 using FitnessTracker.Models;
 using FitnessTracker.Services.Interfaces;
 using FitnessTracker.Utilities;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using MaterialDesignThemes.Wpf;
 
 namespace FitnessTracker.ViewModels
 {
@@ -28,12 +28,22 @@ namespace FitnessTracker.ViewModels
 		{
 			Guard.AgainstNull(settingsService, nameof(settingsService));
 			_settingsService = settingsService;
+
+			SaveCommand = new RelayCommand(() => SaveSettingsAndExit());
+
+			GetSettings();
 		}
+
+		public RelayCommand SaveCommand { get; }
 
 		public SystemSettings SystemSettings
 		{
 			get => _systemSettings ?? new SystemSettings();
-			set => Set(nameof(SystemSettings), ref _systemSettings, value);
+			set
+			{
+				Set(nameof(SystemSettings), ref _systemSettings, value);
+				PopulateSettings();
+			}
 		}
 
 		public bool OverrideWeightGraphMinimum
@@ -58,8 +68,8 @@ namespace FitnessTracker.ViewModels
 
 		public bool OverrideDistanceGraphMaximum
 		{
-			get => _overrideDistanceGraphMinimum;
-			set => Set(nameof(OverrideDistanceGraphMaximum), ref _overrideDistanceGraphMinimum, value);
+			get => _overrideDistanceGraphMaximum;
+			set => Set(nameof(OverrideDistanceGraphMaximum), ref _overrideDistanceGraphMaximum, value);
 		}
 
 		public double WeightGraphMinimum
@@ -84,6 +94,45 @@ namespace FitnessTracker.ViewModels
 		{
 			get => _distanceGraphMaximum;
 			set => Set(nameof(DistanceGraphMaximum), ref _distanceGraphMaximum, value);
+		}
+
+		private void PopulateSettings()
+		{
+			OverrideWeightGraphMinimum = SystemSettings.WeightGraphMinimum.HasValue;
+			OverrideWeightGraphMaximum = SystemSettings.WeightGraphMaximum.HasValue;
+			OverrideDistanceGraphMinimum = SystemSettings.DistanceGraphMinimum.HasValue;
+			OverrideDistanceGraphMaximum = SystemSettings.DistanceGraphMaximum.HasValue;
+
+			WeightGraphMinimum = SystemSettings.WeightGraphMinimum.GetValueOrDefault();
+			WeightGraphMaximum = SystemSettings.WeightGraphMaximum.GetValueOrDefault();
+			DistanceGraphMinimum = SystemSettings.DistanceGraphMinimum.GetValueOrDefault();
+			DistanceGraphMaximum = SystemSettings.DistanceGraphMaximum.GetValueOrDefault();
+		}
+
+		private void SaveSettingsAndExit()
+		{
+			var settings = new SystemSettings
+			{
+				WeightUnit = SystemSettings.WeightUnit,
+				DistanceUnit = SystemSettings.DistanceUnit,
+				WeightGraphMinimum = OverrideWeightGraphMinimum ? (double?)WeightGraphMinimum : null,
+				WeightGraphMaximum = OverrideWeightGraphMaximum ? (double?)WeightGraphMaximum : null,
+				DistanceGraphMinimum = OverrideDistanceGraphMinimum ? (double?)DistanceGraphMinimum : null,
+				DistanceGraphMaximum = OverrideDistanceGraphMaximum ? (double?)DistanceGraphMaximum : null
+			};
+
+			_settingsService.SaveSettings(settings);
+
+			// Reread from disk to ensure data integrity in the running app.
+			GetSettings();
+
+			DialogHost.CloseDialogCommand.Execute(null, null);
+		}
+
+		private void GetSettings()
+		{
+			SystemSettings = _settingsService.ReadSettings();
+			MessengerInstance.Send(new SystemSettingsChangedMessage(SystemSettings));
 		}
 	}
 }

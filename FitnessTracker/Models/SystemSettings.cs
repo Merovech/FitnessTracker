@@ -8,6 +8,7 @@ namespace FitnessTracker.Models
 		{
 			WeightUnit = WeightUnit.Pounds;
 			DistanceUnit = DistanceUnit.Miles;
+			DistanceGraphMinimum = 0;
 		}
 
 		public WeightUnit WeightUnit { get; set; }

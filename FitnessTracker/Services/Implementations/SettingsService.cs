@@ -25,17 +25,35 @@ namespace FitnessTracker.Services.Implementations
 
 		public SystemSettings ReadSettings()
 		{
-			var fileContents = File.ReadAllText(FILENAME);
-			var model = JsonSerializer.Deserialize<SystemSettings>(fileContents, _serializationOptions);
-			Debug.WriteLine(model.ToDebugString());
+			SystemSettings returnSettings = null;
+			if (!File.Exists(FILENAME))
+			{
+				// No settings file, so create one with some basic defaults
+				returnSettings = CreateDefaultSettings();
+			}
+			else
+			{
+				var fileContents = File.ReadAllText(FILENAME);
+				returnSettings = JsonSerializer.Deserialize<SystemSettings>(fileContents, _serializationOptions);
 
-			return model;
+			}
+
+			Debug.WriteLine(returnSettings.ToDebugString());
+			return returnSettings;
 		}
 
 		public void SaveSettings(SystemSettings settings)
 		{
 			var json = JsonSerializer.Serialize(settings, _serializationOptions);
 			File.WriteAllText(FILENAME, json);
+		}
+
+		private SystemSettings CreateDefaultSettings()
+		{
+			var settings = new SystemSettings();
+			SaveSettings(settings);
+
+			return settings;
 		}
 	}
 }
