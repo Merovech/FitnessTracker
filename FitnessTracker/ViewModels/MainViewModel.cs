@@ -30,8 +30,6 @@ namespace FitnessTracker.ViewModels
 
 		public RelayCommand ImportCommand { get; }
 
-		public RelayCommand ExitCommand { get; }
-
 		private async Task ImportAsync()
 		{
 			var filePath = _fileDialogService.OpenFileDialog(IMPORT_FILE_FILTER);
