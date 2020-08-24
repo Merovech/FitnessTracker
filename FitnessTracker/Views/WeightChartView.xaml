@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
 			 xmlns:v="clr-namespace:FitnessTracker.Views"
+			 xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
 			 DataContext="{Binding Source={StaticResource Locator}, Path=WeightChartViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -19,7 +20,7 @@
 				<v:CustomTooltip />
 			</lvc:CartesianChart.DataTooltip>
 			<lvc:CartesianChart.AxisY>
-				<lvc:Axis MinValue="200" />
+				<lvc:Axis MinValue="{Binding SystemSettings.WeightGraphMinimum, TargetNullValue={x:Static sys:Double.NaN}}" MaxValue="{Binding SystemSettings.WeightGraphMaximum, TargetNullValue={x:Static sys:Double.NaN}}"/>
 			</lvc:CartesianChart.AxisY>
 			<lvc:CartesianChart.AxisX>
 				<lvc:Axis Title="Date" LabelFormatter="{Binding Formatter}" >
