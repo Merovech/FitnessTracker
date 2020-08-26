@@ -22,7 +22,7 @@ namespace FitnessTracker.Services.Implementations
 			var retVal = new SummaryStatistics();
 			if (data == null || !data.Any())
 			{
-				return retVal;
+				return null;
 			}
 
 			var dataList = data.ToList();
@@ -34,7 +34,16 @@ namespace FitnessTracker.Services.Implementations
 			for (int i = 0; i < dataList.Count; i++)
 			{
 				var item = dataList[i];
+
+				// Edge case: adding a double to a double? with a value of null yields null, so initialize the double? to 0 first
+				if (!retVal.TotalDistanceMoved.HasValue && item.DistanceMoved.HasValue)
+				{
+					retVal.TotalDistanceMoved = 0.0;
+				}
+
 				var distanceMoved = item.DistanceMoved.GetValueOrDefault();
+				retVal.TotalDistanceMoved += distanceMoved;
+
 				if (distanceMoved > maxDistanceRecord.DistanceMoved.GetValueOrDefault())
 				{
 					maxDistanceRecord = item;
@@ -57,26 +66,41 @@ namespace FitnessTracker.Services.Implementations
 					retVal.AverageDistanceMoved = item.AverageDistanceMoved.GetValueOrDefault();
 				}
 
-				// Current weight is the latest Moving Average value.
+				// Current weight is the latest Moving Average value.  If there is no moving average yet, get the last current weight.
 				if (i == dataList.Count - 1)
 				{
-					retVal.CurrentWeight = item.MovingWeightAverage.GetValueOrDefault();
+					retVal.CurrentWeight = item.MovingWeightAverage;
 					if (dataList.Count > 1)
 					{
-						retVal.WeightChangeSincePrevious = item.MovingWeightAverage.GetValueOrDefault() - dataList[i - 1].MovingWeightAverage.GetValueOrDefault();
+						// In the case where there is no moving average yet (<5 days of data), or this is the first moving average, don't fill this in.
+						// Note that once data is entered, users cannot skip a record (i.e., have a record with a null Weight), so the average is calculated
+						// for every subsequent data point once it hits 5 of them.
+						if (dataList[i - 1].MovingWeightAverage.HasValue)
+						{
+							retVal.WeightChangeSincePrevious = item.MovingWeightAverage.GetValueOrDefault() - dataList[i - 1].MovingWeightAverage.GetValueOrDefault();
+						}
 					}
 				}
-
-				retVal.TotalDistanceMoved += distanceMoved;
 			}
 
-			retVal.TotalWeightChange = retVal.CurrentWeight - startingWeight;
-			retVal.LowestWeight = lowestWeightRecord.MovingWeightAverage.GetValueOrDefault();
-			retVal.LowestWeightDate = lowestWeightRecord.Date;
-			retVal.HighestWeight = highestWeightRecord.MovingWeightAverage.GetValueOrDefault();
-			retVal.HighestWeightDate = highestWeightRecord.Date;
-			retVal.LargestDistanceMoved = maxDistanceRecord.DistanceMoved.GetValueOrDefault();
-			retVal.LargestDistanceMovedDate = maxDistanceRecord.Date;
+			retVal.TotalWeightChange = dataList.Count == 1 ? null : retVal.CurrentWeight - startingWeight;
+			if (lowestWeightRecord.MovingWeightAverage.HasValue && lowestWeightRecord.MovingWeightAverage.Value < double.MaxValue)
+			{
+				retVal.LowestWeight = lowestWeightRecord.MovingWeightAverage.GetValueOrDefault();
+				retVal.LowestWeightDate = lowestWeightRecord.Date;
+			}
+
+			if (highestWeightRecord.MovingWeightAverage.HasValue && highestWeightRecord.MovingWeightAverage.Value > double.MinValue)
+			{
+				retVal.HighestWeight = highestWeightRecord.MovingWeightAverage.GetValueOrDefault();
+				retVal.HighestWeightDate = highestWeightRecord.Date;
+			}
+
+			if (maxDistanceRecord.DistanceMoved.HasValue && maxDistanceRecord.DistanceMoved > double.MinValue)
+			{
+				retVal.LargestDistanceMoved = maxDistanceRecord.DistanceMoved.GetValueOrDefault();
+				retVal.LargestDistanceMovedDate = maxDistanceRecord.Date;
+			}
 
 			CleanupCalculatedValues(retVal);
 
@@ -87,7 +111,7 @@ namespace FitnessTracker.Services.Implementations
 		{
 			for (int i = data.Count - 1; i >= 0; i--)
 			{
-				if (i >= _averageWindowInDays)
+				if (i >= _averageWindowInDays - 1)
 				{
 					var sum = 0.0d;
 					for (int j = 0; j < _averageWindowInDays; j++)
@@ -128,9 +152,20 @@ namespace FitnessTracker.Services.Implementations
 			// TotalDistanceMoved
 			// WeightChangeSincePrevious
 
-			statistics.TotalWeightChange = Math.Round(statistics.TotalWeightChange, 1);
-			statistics.WeightChangeSincePrevious = Math.Round(statistics.WeightChangeSincePrevious, 1);
-			statistics.TotalDistanceMoved = Math.Round(statistics.TotalDistanceMoved, 2);
+			if (statistics.TotalWeightChange.HasValue)
+			{
+				statistics.TotalWeightChange = Math.Round(statistics.TotalWeightChange.Value, 1);
+			}
+
+			if (statistics.WeightChangeSincePrevious.HasValue)
+			{
+				statistics.WeightChangeSincePrevious = Math.Round(statistics.WeightChangeSincePrevious.Value, 1);
+			}
+
+			if (statistics.TotalDistanceMoved.HasValue)
+			{
+				statistics.TotalDistanceMoved = Math.Round(statistics.TotalDistanceMoved.Value, 1);
+			}
 		}
 	}
 }

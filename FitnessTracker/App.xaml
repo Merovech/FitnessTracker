@@ -17,7 +17,8 @@
             <u:ViewModelLocator x:Key="Locator" />
             <c:SharedValueConverter x:Key="SharedConverter" />
             <c:InverseCombineAndBooleansConverter x:Key="InverseCombineBooleanConverter" />
-			<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+			<c:BooleanToVisibilityConverter x:Key="TrueToVisibleConverter" True="Visible" False="Collapsed" />
+			<c:BooleanToVisibilityConverter x:Key="FalseToVisibleConverter" True="Collapsed" False="Visible" />
 		</ResourceDictionary>
     </Application.Resources>
 </Application>
