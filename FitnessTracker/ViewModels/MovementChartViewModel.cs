@@ -16,8 +16,8 @@ namespace FitnessTracker.ViewModels
 	public class MovementChartViewModel : ViewModelBase
 	{
 		private readonly ISettingsService _settingsService;
-		private LineSeries _currentWeightSeries;
-		private LineSeries _averageWeightSeries;
+		private LineSeries _currentDistanceSeries;
+		private LineSeries _averageDistanceSeries;
 		private SystemSettings _systemSettings;
 
 		public MovementChartViewModel(ISettingsService settingsService)
@@ -36,6 +36,8 @@ namespace FitnessTracker.ViewModels
 			SystemSettings = _settingsService.ReadSettings();
 		}
 
+		public bool CanShowGraphs => _currentDistanceSeries.Values.Count > 0 && _averageDistanceSeries.Values.Count > 0;
+
 		public SystemSettings SystemSettings
 		{
 			get => _systemSettings ?? new SystemSettings();
@@ -48,19 +50,21 @@ namespace FitnessTracker.ViewModels
 
 		private void UpdateData(List<DailyRecord> data)
 		{
-			_currentWeightSeries.Values.Clear();
-			_averageWeightSeries.Values.Clear();
+			_currentDistanceSeries.Values.Clear();
+			_averageDistanceSeries.Values.Clear();
 
 			for (int i = 0; i < data.Count; i++)
 			{
-				_currentWeightSeries.Values.Add(new DateSeriesValue { DateTime = data[i].Date, Value = data[i].DistanceMoved });
-				_averageWeightSeries.Values.Add(new DateSeriesValue { DateTime = data[i].Date, Value = data[i].AverageDistanceMoved});
+				_currentDistanceSeries.Values.Add(new DateSeriesValue { DateTime = data[i].Date, Value = data[i].DistanceMoved });
+				_averageDistanceSeries.Values.Add(new DateSeriesValue { DateTime = data[i].Date, Value = data[i].AverageDistanceMoved});
 			}
+
+			RaisePropertyChanged(nameof(CanShowGraphs));
 		}
 
 		private void InitializeWeightSeries()
 		{
-			_currentWeightSeries = new LineSeries
+			_currentDistanceSeries = new LineSeries
 			{
 				Title = "Daily",
 				Values = new ChartValues<DateSeriesValue>(),
@@ -71,7 +75,7 @@ namespace FitnessTracker.ViewModels
 				Fill = Brushes.Transparent
 			};
 
-			_averageWeightSeries = new LineSeries
+			_averageDistanceSeries = new LineSeries
 			{
 				Title = "Average",
 				Values = new ChartValues<DateSeriesValue>(),
@@ -84,7 +88,7 @@ namespace FitnessTracker.ViewModels
 				.X(model => (double)model.DateTime.Ticks / TimeSpan.FromDays(1).Ticks)
 				.Y(model => model.Value ?? double.NaN);
 
-			SeriesData = new SeriesCollection(config) { _currentWeightSeries, _averageWeightSeries };
+			SeriesData = new SeriesCollection(config) { _currentDistanceSeries, _averageDistanceSeries };
 			Formatter = value => new DateTime((long)(value * TimeSpan.FromDays(1).Ticks)).ToString("d");
 		}
 	}

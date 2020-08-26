@@ -39,6 +39,8 @@ namespace FitnessTracker.ViewModels
 
 		public SeriesCollection SeriesData { get; private set; }
 
+		public bool CanShowGraphs => _currentWeightSeries.Values.Count > 0 && _averageWeightSeries.Values.Count > 0;
+
 		public SystemSettings SystemSettings
 		{
 			get =>_systemSettings ?? new SystemSettings();
@@ -57,6 +59,8 @@ namespace FitnessTracker.ViewModels
 				_currentWeightSeries.Values.Add(new DateSeriesValue { DateTime = data[i].Date, Value = data[i].Weight });
 				_averageWeightSeries.Values.Add(new DateSeriesValue { DateTime = data[i].Date, Value = data[i].MovingWeightAverage });
 			}
+
+			RaisePropertyChanged(nameof(CanShowGraphs));
 		}
 
 		private void InitializeWeightSeries()

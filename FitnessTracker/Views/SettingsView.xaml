@@ -95,7 +95,7 @@
 					<TextBox Grid.Column="4" 
 							 Grid.Row="1" 
 							 Width="50" 
-							 Visibility="{Binding ElementName=WeightMinOverride, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"
+							 Visibility="{Binding ElementName=WeightMinOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
 							 Text="{Binding WeightGraphMinimum, FallbackValue=0}"/>
 
 					<TextBlock Grid.Column="0" 
@@ -111,7 +111,7 @@
 					<TextBox Grid.Column="4" 
 							 Grid.Row="2" 
 							 Width="50" 
-							 Visibility="{Binding ElementName=WeightMaxOverride, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"
+							 Visibility="{Binding ElementName=WeightMaxOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
 							 Text="{Binding WeightGraphMaximum, FallbackValue=0}"/>
 
 					<TextBlock Grid.Column="0" 
@@ -135,7 +135,7 @@
 					<TextBox Grid.Column="4" 
 							 Grid.Row="5" 
 							 Width="50"
-							 Visibility="{Binding ElementName=DistanceMinOverride, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"
+							 Visibility="{Binding ElementName=DistanceMinOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
 							 Text="{Binding DistanceGraphMinimum, FallbackValue=0}"/>
 
 					<TextBlock Grid.Column="0" 
@@ -151,7 +151,7 @@
 					<TextBox Grid.Column="4" 
 							 Grid.Row="6" 
 							 Width="50"
-							 Visibility="{Binding ElementName=DistanceMaxOverride, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"
+							 Visibility="{Binding ElementName=DistanceMaxOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
 							 Text="{Binding DistanceGraphMaximum, FallbackValue=0}"/>
 				</Grid>
 			</GroupBox>

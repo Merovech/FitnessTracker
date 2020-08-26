@@ -25,9 +25,10 @@
 			<Grid Grid.Row="2">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="38"/>
+					<RowDefinition Height="50"/>
 					<RowDefinition Height="*"/>
 				</Grid.RowDefinitions>
-				<materialDesign:ColorZone Mode="PrimaryDark" Padding="0">
+				<materialDesign:ColorZone Mode="PrimaryDark" Padding="0" Grid.Row="0">
 					<Grid>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*" />
@@ -51,21 +52,38 @@
 						</StackPanel>
 					</Grid>
 				</materialDesign:ColorZone>
-				<Grid Grid.Row="1">
-					<Grid Visibility="{Binding IsChecked, ElementName=rbTab1, Converter={StaticResource BooleanToVisibilityConverter}}">
-						<Grid>
+				<v:AddEditDataView Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+				<Grid Grid.Row="2">
+					<Grid Visibility="{Binding IsChecked, ElementName=rbTab1, Converter={StaticResource TrueToVisibleConverter}}">
+						<Border Visibility="{Binding CanShowGraphs, Converter={StaticResource FalseToVisibleConverter}}">
+							<TextBlock FontSize="40" 
+										   Foreground="{DynamicResource SecondaryHueMidBrush}"
+										   VerticalAlignment="Center"
+										   HorizontalAlignment="Center">
+									Import or enter data to see graphs.
+							</TextBlock>
+						</Border>
+						<Grid Visibility="{Binding CanShowGraphs, Converter={StaticResource TrueToVisibleConverter}}">
 							<Grid.RowDefinitions>
-								<RowDefinition Height="50" />
 								<RowDefinition />
 								<RowDefinition />
 							</Grid.RowDefinitions>
-							<v:AddEditDataView Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<v:WeightChartView Grid.Row="1"/>
-							<v:MovementChartView Grid.Row="2" />
+							<v:WeightChartView Grid.Row="0"/>
+							<v:MovementChartView Grid.Row="1" />
 						</Grid>
 					</Grid>
-					<Grid Visibility="{Binding IsChecked, ElementName=rbTab2, Converter={StaticResource BooleanToVisibilityConverter}}">
-						<v:RawDataView />
+					<Grid Visibility="{Binding IsChecked, ElementName=rbTab2, Converter={StaticResource TrueToVisibleConverter}}">
+						<Border Visibility="{Binding CanShowGraphs, Converter={StaticResource FalseToVisibleConverter}}">
+							<TextBlock FontSize="40" 
+										   Foreground="{DynamicResource SecondaryHueMidBrush}"
+										   VerticalAlignment="Center"
+										   HorizontalAlignment="Center">
+									Import or enter data to see graphs.
+							</TextBlock>
+						</Border>
+						<Border BorderThickness="0" Visibility="{Binding CanShowGraphs, Converter={StaticResource TrueToVisibleConverter}}" >
+							<v:RawDataView />
+						</Border>
 					</Grid>
 				</Grid>
 			</Grid>

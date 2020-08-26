@@ -37,8 +37,35 @@ namespace FitnessTracker.ViewModels
 		public SummaryStatistics SummaryData
 		{
 			get => _summaryStatistics;
-			set => Set(nameof(SummaryData), ref _summaryStatistics, value);
+			set
+			{
+				Set(nameof(SummaryData), ref _summaryStatistics, value);
+				RaisePropertyChanged(nameof(CurrentWeight));
+				RaisePropertyChanged(nameof(TotalWeightChange));
+				RaisePropertyChanged(nameof(WeightChangeSinceLast));
+				RaisePropertyChanged(nameof(LowestWeight));
+				RaisePropertyChanged(nameof(HighestWeight));
+				RaisePropertyChanged(nameof(TotalDistanceMoved)); 
+				RaisePropertyChanged(nameof(AverageDistanceMoved));
+				RaisePropertyChanged(nameof(LargestDistanceMoved));
+			}
 		}
+
+		public double? CurrentWeight => _summaryStatistics?.CurrentWeight;
+
+		public double? TotalWeightChange => _summaryStatistics?.TotalWeightChange;
+
+		public double? WeightChangeSinceLast => _summaryStatistics?.WeightChangeSincePrevious;
+
+		public double? LowestWeight => _summaryStatistics?.LowestWeight;
+
+		public double? HighestWeight => _summaryStatistics?.HighestWeight;
+
+		public double? TotalDistanceMoved => _summaryStatistics?.TotalDistanceMoved;
+
+		public double? AverageDistanceMoved => _summaryStatistics?.AverageDistanceMoved;
+		
+		public double? LargestDistanceMoved => _summaryStatistics?.LargestDistanceMoved;
 
 		public SystemSettings SystemSettings
 		{

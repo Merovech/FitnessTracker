@@ -15,6 +15,8 @@ namespace FitnessTracker.ViewModels
 
 		private const string IMPORT_FILE_FILTER = "Comma-Separated Files|*.csv";
 
+		private bool _canShowGraphs;
+
 		public MainViewModel(IDataImporterService importerService, IFileDialogService fileDialogService, ISettingsService settingsService)
 		{
 			Guard.AgainstNull(importerService, nameof(importerService));
@@ -25,7 +27,15 @@ namespace FitnessTracker.ViewModels
 			_fileDialogService = fileDialogService;
 			_settingsService = settingsService;
 
+			MessengerInstance.Register<NotifyDataExistsMessage>(this, msg => CanShowGraphs = msg.Content);
+
 			ImportCommand = new RelayCommand(async () => await ImportAsync());
+		}
+
+		public bool CanShowGraphs
+		{
+			get => _canShowGraphs;
+			set => Set(nameof(CanShowGraphs), ref _canShowGraphs, value);
 		}
 
 		public RelayCommand ImportCommand { get; }

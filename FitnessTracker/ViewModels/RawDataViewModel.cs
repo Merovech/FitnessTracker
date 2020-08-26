@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using FitnessTracker.Messages;
 using FitnessTracker.Models;
@@ -35,6 +36,7 @@ namespace FitnessTracker.ViewModels
 			Data = new ObservableCollection<DailyRecord>(newData);
 
 			MessengerInstance.Send(new DataRetrievedMessage(newData));
+			MessengerInstance.Send(new NotifyDataExistsMessage(newData.Any()));
 		}
 	}
 }
