@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Messages;
+﻿using System.ComponentModel;
+using FitnessTracker.Messages;
 using FitnessTracker.Models;
 using FitnessTracker.Services.Interfaces;
 using FitnessTracker.Utilities;
@@ -8,7 +9,7 @@ using MaterialDesignThemes.Wpf;
 
 namespace FitnessTracker.ViewModels
 {
-	public class SettingsViewModel : ViewModelBase
+	public class SettingsViewModel : ViewModelBase, IDataErrorInfo
 	{
 		private readonly ISettingsService _settingsService;
 		private SystemSettings _systemSettings;
@@ -75,26 +76,72 @@ namespace FitnessTracker.ViewModels
 		public double WeightGraphMinimum
 		{
 			get => _weightGraphMinimum;
-			set => Set(nameof(WeightGraphMinimum), ref _weightGraphMinimum, value);
+			set {
+				Set(nameof(WeightGraphMinimum), ref _weightGraphMinimum, value);
+				RaisePropertyChanged(nameof(WeightGraphMaximum));
+			}
 		}
 
 		public double WeightGraphMaximum
 		{
 			get => _weightGraphMaximum;
-			set => Set(nameof(WeightGraphMaximum), ref _weightGraphMaximum, value);
+			set {
+				Set(nameof(WeightGraphMaximum), ref _weightGraphMaximum, value);
+				RaisePropertyChanged(nameof(WeightGraphMinimum));
+			}
 		}
 
 		public double DistanceGraphMinimum
 		{
 			get => _distanceGraphMinimum;
-			set => Set(nameof(DistanceGraphMinimum), ref _distanceGraphMinimum, value);
+			set
+			{
+				Set(nameof(DistanceGraphMinimum), ref _distanceGraphMinimum, value);
+				RaisePropertyChanged(nameof(DistanceGraphMaximum));
+			}
 		}
 
 		public double DistanceGraphMaximum
 		{
 			get => _distanceGraphMaximum;
-			set => Set(nameof(DistanceGraphMaximum), ref _distanceGraphMaximum, value);
+			set
+			{
+				Set(nameof(DistanceGraphMaximum), ref _distanceGraphMaximum, value);
+				RaisePropertyChanged(nameof(DistanceGraphMinimum));
+			}
 		}
+
+		public string Error => string.Empty;
+
+		public string this[string columnName]
+		{
+			get
+			{
+				switch (columnName)
+				{
+					case nameof(WeightGraphMinimum):
+					case nameof(WeightGraphMaximum):
+						if (WeightGraphMinimum >= WeightGraphMaximum)
+						{
+							return "Minimum must be less than maximum.";
+						}
+
+						break;
+
+					case nameof(DistanceGraphMinimum):
+					case nameof(DistanceGraphMaximum):
+						if (DistanceGraphMinimum <= DistanceGraphMaximum)
+						{
+							return "Minimum must be less than maximum.";
+						}
+
+						break;
+				}
+
+				return string.Empty;
+			}
+		}
+
 
 		private void PopulateSettings()
 		{

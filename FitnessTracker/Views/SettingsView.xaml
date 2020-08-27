@@ -96,7 +96,8 @@
 							 Grid.Row="1" 
 							 Width="50" 
 							 Visibility="{Binding ElementName=WeightMinOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
-							 Text="{Binding WeightGraphMinimum, FallbackValue=0}"/>
+							 materialDesign:ValidationAssist.UsePopup="True"
+							 Text="{Binding WeightGraphMinimum, FallbackValue=0, ValidatesOnDataErrors=True}"/>
 
 					<TextBlock Grid.Column="0" 
 							   Grid.Row="2" 
@@ -112,7 +113,8 @@
 							 Grid.Row="2" 
 							 Width="50" 
 							 Visibility="{Binding ElementName=WeightMaxOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
-							 Text="{Binding WeightGraphMaximum, FallbackValue=0}"/>
+							 materialDesign:ValidationAssist.UsePopup="True"
+							 Text="{Binding WeightGraphMaximum, FallbackValue=0, ValidatesOnDataErrors=True}"/>
 
 					<TextBlock Grid.Column="0" 
 							   Grid.ColumnSpan="4"
@@ -136,7 +138,8 @@
 							 Grid.Row="5" 
 							 Width="50"
 							 Visibility="{Binding ElementName=DistanceMinOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
-							 Text="{Binding DistanceGraphMinimum, FallbackValue=0}"/>
+							 materialDesign:ValidationAssist.UsePopup="True"
+							 Text="{Binding DistanceGraphMinimum, FallbackValue=0, ValidatesOnDataErrors=True}"/>
 
 					<TextBlock Grid.Column="0" 
 							   Grid.Row="6" 
@@ -152,7 +155,8 @@
 							 Grid.Row="6" 
 							 Width="50"
 							 Visibility="{Binding ElementName=DistanceMaxOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
-							 Text="{Binding DistanceGraphMaximum, FallbackValue=0}"/>
+							 materialDesign:ValidationAssist.UsePopup="True"
+							 Text="{Binding DistanceGraphMaximum, FallbackValue=0, ValidatesOnDataErrors=True}"/>
 				</Grid>
 			</GroupBox>
 			<StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Center">

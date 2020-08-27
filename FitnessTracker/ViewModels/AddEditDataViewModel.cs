@@ -8,10 +8,11 @@ using FitnessTracker.Utilities;
 using FitnessTracker.Services.Interfaces;
 using GalaSoft.MvvmLight.Command;
 using FitnessTracker.Messages;
+using System.ComponentModel;
 
 namespace FitnessTracker.ViewModels
 {
-	public class AddEditDataViewModel : ViewModelBase
+	public class AddEditDataViewModel : ViewModelBase, IDataErrorInfo
 	{
 		private readonly IDatabaseService _databaseService;
 
@@ -60,6 +61,35 @@ namespace FitnessTracker.ViewModels
 		{
 			get => _isIdle;
 			set => Set(nameof(IsIdle), ref _isIdle, value);
+		}
+
+		public string Error => string.Empty;
+
+		public string this[string columnName]
+		{
+			get
+			{
+				switch (columnName)
+				{
+					case "Weight":
+						if (Weight < 0)
+						{
+							return "Minimum 0";
+						}
+
+						break;
+
+					case "Distance":
+						if (Distance.HasValue && Distance < 0)
+						{
+							return "Minimum 0\nCan be blank";
+						}
+
+						break;
+				}
+
+				return string.Empty;
+			}
 		}
 
 		private async Task RetrieveRecord()
