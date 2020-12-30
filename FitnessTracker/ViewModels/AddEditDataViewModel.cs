@@ -8,10 +8,11 @@ using FitnessTracker.Utilities;
 using FitnessTracker.Services.Interfaces;
 using GalaSoft.MvvmLight.Command;
 using FitnessTracker.Messages;
+using System.ComponentModel;
 
 namespace FitnessTracker.ViewModels
 {
-	public class AddEditDataViewModel : ViewModelBase
+	public class AddEditDataViewModel : ViewModelBase, IDataErrorInfo
 	{
 		private readonly IDatabaseService _databaseService;
 
@@ -44,10 +45,12 @@ namespace FitnessTracker.ViewModels
 			}
 		}
 
-		public double Weight
+		public double? Weight
 		{
+			// This is only a double so it can be properly validated in the edge case where the user tries to enter
+			// no value at all.
 			get => _weight;
-			set => Set(nameof(Weight), ref _weight, value);
+			set => Set(nameof(Weight), ref _weight, value ?? 0);
 		}
 
 		public double? Distance
@@ -62,6 +65,30 @@ namespace FitnessTracker.ViewModels
 			set => Set(nameof(IsIdle), ref _isIdle, value);
 		}
 
+		public string Error => string.Empty;
+
+		public string this[string columnName]
+		{
+			get
+			{
+				// We have to use this method of data validation (as oposed to ValidateRules) for Distance because
+				// Distance can be empty while weight cannot.  If we use the same approach here as we do in Weight,
+				// then typing a value and deleting it yields "Cannot convert value ''".
+				switch (columnName)
+				{
+					case "Distance":
+						if (Distance.HasValue && Distance < 0)
+						{
+							return "Minimum 0\nCan be blank";
+						}
+
+						break;
+				}
+
+				return string.Empty;
+			}
+		}
+
 		private async Task RetrieveRecord()
 		{
 			IsIdle = false;
@@ -74,7 +101,7 @@ namespace FitnessTracker.ViewModels
 
 		private async Task Upsert()
 		{
-			await _databaseService.Upsert(Date, Weight, Distance);
+			await _databaseService.Upsert(Date, Weight.Value, Distance);
 			MessengerInstance.Send(new NewDataAvailableMessage());
 		}
 	}

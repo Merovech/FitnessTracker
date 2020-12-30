@@ -1,4 +1,8 @@
-﻿using FitnessTracker.Messages;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using FitnessTracker.Messages;
 using FitnessTracker.Models;
 using FitnessTracker.Services.Interfaces;
 using FitnessTracker.Utilities;
@@ -29,7 +33,8 @@ namespace FitnessTracker.ViewModels
 			Guard.AgainstNull(settingsService, nameof(settingsService));
 			_settingsService = settingsService;
 
-			SaveCommand = new RelayCommand(() => SaveSettingsAndExit());
+			SaveCommand = new RelayCommand(() => SaveSettingsAndExit(), () => ErrorMessages != null && !ErrorMessages.Any());
+			ErrorMessages = new ObservableCollection<string>();
 
 			GetSettings();
 		}
@@ -49,51 +54,105 @@ namespace FitnessTracker.ViewModels
 		public bool OverrideWeightGraphMinimum
 		{
 			get => _overrideWeightGraphMinimum;
-			set => Set(nameof(OverrideWeightGraphMinimum), ref _overrideWeightGraphMinimum, value);
+			set
+			{
+				Set(nameof(OverrideWeightGraphMinimum), ref _overrideWeightGraphMinimum, value);
+				ValidateForm();
+			}
 		}
 
 		public bool OverrideWeightGraphMaximum
 		{
 			get => _overrideWeightGraphMaximum;
-			set => Set(nameof(OverrideWeightGraphMaximum), ref _overrideWeightGraphMaximum, value);
-
+			set
+			{
+				Set(nameof(OverrideWeightGraphMaximum), ref _overrideWeightGraphMaximum, value);
+				ValidateForm();
+			}
 		}
 
 		public bool OverrideDistanceGraphMinimum
 		{
 			get => _overrideDistanceGraphMinimum;
-			set => Set(nameof(OverrideDistanceGraphMinimum), ref _overrideDistanceGraphMinimum, value);
-
+			set
+			{
+				Set(nameof(OverrideDistanceGraphMinimum), ref _overrideDistanceGraphMinimum, value);
+				ValidateForm();
+			}
 		}
 
 		public bool OverrideDistanceGraphMaximum
 		{
 			get => _overrideDistanceGraphMaximum;
-			set => Set(nameof(OverrideDistanceGraphMaximum), ref _overrideDistanceGraphMaximum, value);
+			set
+			{
+				Set(nameof(OverrideDistanceGraphMaximum), ref _overrideDistanceGraphMaximum, value);
+				ValidateForm();
+			}
 		}
 
 		public double WeightGraphMinimum
 		{
 			get => _weightGraphMinimum;
-			set => Set(nameof(WeightGraphMinimum), ref _weightGraphMinimum, value);
+			set
+			{
+				Set(nameof(WeightGraphMinimum), ref _weightGraphMinimum, value);
+				RaisePropertyChanged(nameof(WeightGraphMaximum));
+				ValidateForm();
+			}
 		}
 
 		public double WeightGraphMaximum
 		{
 			get => _weightGraphMaximum;
-			set => Set(nameof(WeightGraphMaximum), ref _weightGraphMaximum, value);
+			set
+			{
+				Set(nameof(WeightGraphMaximum), ref _weightGraphMaximum, value);
+				RaisePropertyChanged(nameof(WeightGraphMinimum));
+				ValidateForm();
+			}
 		}
 
 		public double DistanceGraphMinimum
 		{
 			get => _distanceGraphMinimum;
-			set => Set(nameof(DistanceGraphMinimum), ref _distanceGraphMinimum, value);
+			set
+			{
+				Set(nameof(DistanceGraphMinimum), ref _distanceGraphMinimum, value);
+				RaisePropertyChanged(nameof(DistanceGraphMaximum));
+				ValidateForm();
+			}
 		}
 
 		public double DistanceGraphMaximum
 		{
 			get => _distanceGraphMaximum;
-			set => Set(nameof(DistanceGraphMaximum), ref _distanceGraphMaximum, value);
+			set
+			{
+				Set(nameof(DistanceGraphMaximum), ref _distanceGraphMaximum, value);
+				RaisePropertyChanged(nameof(DistanceGraphMinimum));
+				ValidateForm();
+			}
+		}
+
+		public ObservableCollection<string> ErrorMessages { get; set; }
+
+		public void ValidateForm()
+		{
+			ErrorMessages.Clear();
+
+			if (OverrideWeightGraphMinimum && OverrideWeightGraphMaximum && WeightGraphMinimum >= WeightGraphMaximum)
+			{
+				ErrorMessages.Add("Weight Graph: Minimum must be less than maximum.");
+			}
+
+			if (OverrideDistanceGraphMinimum && OverrideDistanceGraphMaximum && DistanceGraphMinimum >= DistanceGraphMaximum)
+			{
+				ErrorMessages.Add("Distance Graph: Minimum must be less than maximum.");
+			}
+
+			RaisePropertyChanged(nameof(ErrorMessages));
+			SaveCommand.RaiseCanExecuteChanged();
 		}
 
 		private void PopulateSettings()

@@ -18,6 +18,8 @@
 				<RowDefinition Height="Auto" />
 				<RowDefinition Height="10" />
 				<RowDefinition Height="Auto" />
+				<RowDefinition Height="10" />
+				<RowDefinition Height="Auto" />
 			</Grid.RowDefinitions>
 			<GroupBox Header="Units" Grid.Row="0">
 				<Grid>
@@ -96,7 +98,7 @@
 							 Grid.Row="1" 
 							 Width="50" 
 							 Visibility="{Binding ElementName=WeightMinOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
-							 Text="{Binding WeightGraphMinimum, FallbackValue=0}"/>
+							 Text="{Binding WeightGraphMinimum, FallbackValue=0, ValidatesOnDataErrors=True}"/>
 
 					<TextBlock Grid.Column="0" 
 							   Grid.Row="2" 
@@ -112,7 +114,7 @@
 							 Grid.Row="2" 
 							 Width="50" 
 							 Visibility="{Binding ElementName=WeightMaxOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
-							 Text="{Binding WeightGraphMaximum, FallbackValue=0}"/>
+							 Text="{Binding WeightGraphMaximum, FallbackValue=0, ValidatesOnDataErrors=True}"/>
 
 					<TextBlock Grid.Column="0" 
 							   Grid.ColumnSpan="4"
@@ -136,7 +138,7 @@
 							 Grid.Row="5" 
 							 Width="50"
 							 Visibility="{Binding ElementName=DistanceMinOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
-							 Text="{Binding DistanceGraphMinimum, FallbackValue=0}"/>
+							 Text="{Binding DistanceGraphMinimum, FallbackValue=0, ValidatesOnDataErrors=True}"/>
 
 					<TextBlock Grid.Column="0" 
 							   Grid.Row="6" 
@@ -152,7 +154,7 @@
 							 Grid.Row="6" 
 							 Width="50"
 							 Visibility="{Binding ElementName=DistanceMaxOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
-							 Text="{Binding DistanceGraphMaximum, FallbackValue=0}"/>
+							 Text="{Binding DistanceGraphMaximum, FallbackValue=0, ValidatesOnDataErrors=True}"/>
 				</Grid>
 			</GroupBox>
 			<StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Center">
@@ -166,6 +168,13 @@
 						Margin="8 0 0 0" 
 						Content="CANCEL" />
 			</StackPanel>
+			<ItemsControl Grid.Row="6" ItemsSource="{Binding ErrorMessages}" MaxWidth="300">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<TextBlock Text="{Binding}" FontSize="11" Foreground="Red" TextWrapping="Wrap" />
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
 		</Grid>
 	</Border>
 </UserControl>

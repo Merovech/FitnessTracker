@@ -25,7 +25,7 @@
 			<Grid Grid.Row="2">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="38"/>
-					<RowDefinition Height="50"/>
+					<RowDefinition Height="60"/>
 					<RowDefinition Height="*"/>
 				</Grid.RowDefinitions>
 				<materialDesign:ColorZone Mode="PrimaryDark" Padding="0" Grid.Row="0">
@@ -52,7 +52,7 @@
 						</StackPanel>
 					</Grid>
 				</materialDesign:ColorZone>
-				<v:AddEditDataView Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+				<v:AddEditDataView Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="5"/>
 				<Grid Grid.Row="2">
 					<Grid Visibility="{Binding IsChecked, ElementName=rbTab1, Converter={StaticResource TrueToVisibleConverter}}">
 						<Border Visibility="{Binding CanShowGraphs, Converter={StaticResource FalseToVisibleConverter}}">
