@@ -45,10 +45,12 @@ namespace FitnessTracker.ViewModels
 			}
 		}
 
-		public double Weight
+		public double? Weight
 		{
+			// This is only a double so it can be properly validated in the edge case where the user tries to enter
+			// no value at all.
 			get => _weight;
-			set => Set(nameof(Weight), ref _weight, value);
+			set => Set(nameof(Weight), ref _weight, value ?? 0);
 		}
 
 		public double? Distance
@@ -69,16 +71,11 @@ namespace FitnessTracker.ViewModels
 		{
 			get
 			{
+				// We have to use this method of data validation (as oposed to ValidateRules) for Distance because
+				// Distance can be empty while weight cannot.  If we use the same approach here as we do in Weight,
+				// then typing a value and deleting it yields "Cannot convert value ''".
 				switch (columnName)
 				{
-					case "Weight":
-						if (Weight < 0)
-						{
-							return "Minimum 0";
-						}
-
-						break;
-
 					case "Distance":
 						if (Distance.HasValue && Distance < 0)
 						{
@@ -104,7 +101,7 @@ namespace FitnessTracker.ViewModels
 
 		private async Task Upsert()
 		{
-			await _databaseService.Upsert(Date, Weight, Distance);
+			await _databaseService.Upsert(Date, Weight.Value, Distance);
 			MessengerInstance.Send(new NewDataAvailableMessage());
 		}
 	}

@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vr="clr-namespace:FitnessTracker.ValidationRules"
              mc:Ignorable="d" 
 			 Height="40" Width="410"
 			 DataContext="{Binding Source={StaticResource Locator}, Path=AddEditDataViewModel}">
@@ -25,7 +26,17 @@
 		<TextBlock Grid.Row="0" Grid.Column="4" FontSize="10" FontWeight="Bold" Foreground="#888888" Text="Distance" />
 
 		<DatePicker Grid.Row="1" Grid.Column="0" SelectedDateFormat="Short" SelectedDate="{Binding Date, Mode=TwoWay}" IsEnabled="{Binding IsIdle}"/>
-		<TextBox Name="WeightInput" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding IsIdle}" Text="{Binding Weight, Mode=TwoWay, ValidatesOnDataErrors=True}"/>
+		<TextBox Name="WeightInput" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding IsIdle}">
+			<TextBox.Text>
+				<Binding Path="Weight"
+						 Mode="TwoWay"
+						 UpdateSourceTrigger="PropertyChanged">
+					<Binding.ValidationRules>
+						<vr:MinimumNotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+					</Binding.ValidationRules>					
+				</Binding>
+			</TextBox.Text>
+		</TextBox>
 		<TextBox Name="DistanceInput" Grid.Row="1" Grid.Column="4" IsEnabled="{Binding IsIdle}" Text="{Binding Distance, Mode=TwoWay, ValidatesOnDataErrors=True, TargetNullValue=''}"/>
 		<Button 
 			Grid.Row="1" 
