@@ -130,7 +130,7 @@ namespace FitnessTracker.ViewModels
 
 					case nameof(DistanceGraphMinimum):
 					case nameof(DistanceGraphMaximum):
-						if (DistanceGraphMinimum <= DistanceGraphMaximum)
+						if (DistanceGraphMinimum >= DistanceGraphMaximum)
 						{
 							return "Minimum must be less than maximum.";
 						}
