@@ -15,7 +15,7 @@ namespace FitnessTracker.ValidationRules
 				return new ValidationResult(false, _message);
 			}
 
-			if (!double.TryParse(value.ToString(), out double result))
+			if (!double.TryParse(value.ToString(), NumberStyles.AllowDecimalPoint, cultureInfo, out double result))
 			{
 				return new ValidationResult(false, _message);
 			}

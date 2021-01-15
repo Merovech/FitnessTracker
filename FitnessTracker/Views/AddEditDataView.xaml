@@ -29,10 +29,9 @@
 		<TextBox Name="WeightInput" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding IsIdle}">
 			<TextBox.Text>
 				<Binding Path="Weight"
-						 Mode="TwoWay"
-						 UpdateSourceTrigger="PropertyChanged">
+						 Mode="TwoWay">
 					<Binding.ValidationRules>
-						<vr:MinimumNotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+						<vr:MinimumNotEmptyValidationRule />
 					</Binding.ValidationRules>					
 				</Binding>
 			</TextBox.Text>
