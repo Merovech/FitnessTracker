@@ -45,7 +45,7 @@ namespace FitnessTracker.ViewModels
 			var filePath = _fileDialogService.OpenFileDialog(IMPORT_FILE_FILTER);
 			if (!string.IsNullOrEmpty(filePath))
 			{
-				await _importerService.ImportData("importdata.csv");
+				await _importerService.ImportData(filePath);
 				MessengerInstance.Send(new NewDataAvailableMessage());
 			}
 		}

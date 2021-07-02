@@ -43,6 +43,17 @@ namespace FitnessTracker.Services.Implementations
 				throw new InvalidOperationException($"Invalid data for parsing date: [{rawData[0]}].");
 			}
 
+			// Convert empty strings to zeroes
+			if (string.IsNullOrEmpty(rawData[1]))
+			{
+				rawData[1] = "0";
+			}
+
+			if (string.IsNullOrEmpty(rawData[2]))
+			{
+				rawData[2] = "0";
+			}
+
 			if (!double.TryParse(rawData[1], out double weight))
 			{
 				throw new InvalidOperationException($"Invalid data for parsing weight: [{rawData[1]}].");
@@ -50,7 +61,7 @@ namespace FitnessTracker.Services.Implementations
 
 			if (!Helpers.TryParse(rawData[2], double.TryParse, out double? distanceMoved))
 			{
-				throw new InvalidOperationException($"Invalid data for parsing distance moved: [{rawData[3]}].");
+				throw new InvalidOperationException($"Invalid data for parsing distance moved: [{rawData[2]}].");
 			}
 
 			return new DailyRecord

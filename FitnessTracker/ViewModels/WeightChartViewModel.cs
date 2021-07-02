@@ -70,7 +70,7 @@ namespace FitnessTracker.ViewModels
 				Title = "Daily",
 				Values = new ChartValues<DateSeriesValue>(),
 				PointGeometry = DefaultGeometries.Circle,
-				PointGeometrySize = 5,
+				PointGeometrySize = 2,
 				LineSmoothness = 0,
 				PointForeground = Brushes.CornflowerBlue,
 				Fill = Brushes.Transparent
