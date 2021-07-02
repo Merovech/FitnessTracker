@@ -14,7 +14,7 @@
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{materialDesign:MaterialDesignFont}" 
         DataContext="{Binding Source={StaticResource Locator}, Path=MainViewModel}"
-        Title="MainWindow" Height="1000" Width="1600">
+        Title="Fitness Tracker" Height="1000" Width="1600">
 	<materialDesign:DialogHost>
 		<materialDesign:DialogHost.DialogContent>
 			<v:SettingsView />

@@ -15,7 +15,7 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 		<TextBlock Grid.Row="0" FontSize="16" FontWeight="Bold" Text="Movement" HorizontalAlignment="Center"/>
-		<lvc:CartesianChart Grid.Row="1" Series="{Binding SeriesData}" LegendLocation="Top" >
+		<lvc:CartesianChart Grid.Row="1" Series="{Binding SeriesData}" LegendLocation="Top" DisableAnimations="True">
 			<lvc:CartesianChart.DataTooltip>
 				<v:CustomTooltip />
 			</lvc:CartesianChart.DataTooltip>
