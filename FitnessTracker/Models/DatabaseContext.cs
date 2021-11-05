@@ -32,7 +32,6 @@ namespace FitnessTracker.Models
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<DailyRecord>().Ignore(dr => dr.MovingWeightAverage);
-			modelBuilder.Entity<DailyRecord>().Ignore(dr => dr.AverageDistanceMoved);
 		}
 	}
 }

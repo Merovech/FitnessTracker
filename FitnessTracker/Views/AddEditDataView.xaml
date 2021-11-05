@@ -17,13 +17,11 @@
 			<ColumnDefinition Width="10" />
 			<ColumnDefinition Width="75" />
 			<ColumnDefinition Width="10" />
-			<ColumnDefinition Width="75" />
-			<ColumnDefinition Width="10" />
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
+		
 		<TextBlock Grid.Row="0" Grid.Column="0" FontSize="10" FontWeight="Bold" Foreground="#888888" Text="Date" />
 		<TextBlock Grid.Row="0" Grid.Column="2" FontSize="10" FontWeight="Bold" Foreground="#888888" Text="Weight" />
-		<TextBlock Grid.Row="0" Grid.Column="4" FontSize="10" FontWeight="Bold" Foreground="#888888" Text="Distance" />
 
 		<DatePicker Grid.Row="1" Grid.Column="0" SelectedDateFormat="Short" SelectedDate="{Binding Date, Mode=TwoWay}" IsEnabled="{Binding IsIdle}"/>
 		<TextBox Name="WeightInput" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding IsIdle}">
@@ -36,7 +34,6 @@
 				</Binding>
 			</TextBox.Text>
 		</TextBox>
-		<TextBox Name="DistanceInput" Grid.Row="1" Grid.Column="4" IsEnabled="{Binding IsIdle}" Text="{Binding Distance, Mode=TwoWay, ValidatesOnDataErrors=True, TargetNullValue=''}"/>
 		<Button 
 			Grid.Row="1" 
 			Grid.Column="6" 
@@ -47,7 +44,6 @@
 			<Button.IsEnabled>
 				<MultiBinding Converter="{StaticResource InverseCombineBooleanConverter}">
 					<Binding ElementName="WeightInput" Path="(Validation.HasError)" />
-					<Binding ElementName="DistanceInput" Path="(Validation.HasError)" />
 				</MultiBinding>
 			</Button.IsEnabled>
 		</Button>

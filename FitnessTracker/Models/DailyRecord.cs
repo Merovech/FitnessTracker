@@ -13,9 +13,5 @@ namespace FitnessTracker.Models
 		public double Weight { get; set; }
 
 		public double? MovingWeightAverage { get; set; }
-
-		public double? DistanceMoved { get; set; }
-
-		public double? AverageDistanceMoved { get; set; }
 	}
 }

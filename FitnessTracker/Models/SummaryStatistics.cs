@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FitnessTracker.Models
 {
@@ -19,13 +17,5 @@ namespace FitnessTracker.Models
 		public DateTime? HighestWeightDate { get; set; }
 
 		public double? WeightChangeSincePrevious { get; set; }
-
-		public double? TotalDistanceMoved { get; set;  }
-
-		public double? LargestDistanceMoved { get; set; }
-
-		public DateTime? LargestDistanceMovedDate { get; set; }
-
-		public double? AverageDistanceMoved { get; set; }
 	}
 }

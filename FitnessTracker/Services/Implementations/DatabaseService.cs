@@ -29,18 +29,17 @@ namespace FitnessTracker.Services.Implementations
 			_context.SaveChanges();
 		}
 
-		public async Task Upsert(DateTime date, double weight, double? distance)
+		public async Task Upsert(DateTime date, double weight)
 		{
 			var existingRecord = await _context.Records.FirstOrDefaultAsync(x => x.Date == date);
 			if (existingRecord == null)
 			{
-				_context.Records.Add(new DailyRecord { Date = date, Weight = weight, DistanceMoved = distance });
+				_context.Records.Add(new DailyRecord { Date = date, Weight = weight});
 			}
 			else
 			{
 				var entry = _context.Entry(existingRecord);
 				entry.Entity.Weight = weight;
-				entry.Entity.DistanceMoved = distance;
 				entry.State = EntityState.Modified;
 			}
 
