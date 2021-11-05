@@ -59,16 +59,10 @@ namespace FitnessTracker.Services.Implementations
 				throw new InvalidOperationException($"Invalid data for parsing weight: [{rawData[1]}].");
 			}
 
-			if (!Helpers.TryParse(rawData[2], double.TryParse, out double? distanceMoved))
-			{
-				throw new InvalidOperationException($"Invalid data for parsing distance moved: [{rawData[2]}].");
-			}
-
 			return new DailyRecord
 			{
 				Date = date,
 				Weight = weight,
-				DistanceMoved = distanceMoved
 			};
 		}
 	}

@@ -45,9 +45,6 @@ namespace FitnessTracker.ViewModels
 				RaisePropertyChanged(nameof(WeightChangeSinceLast));
 				RaisePropertyChanged(nameof(LowestWeight));
 				RaisePropertyChanged(nameof(HighestWeight));
-				RaisePropertyChanged(nameof(TotalDistanceMoved)); 
-				RaisePropertyChanged(nameof(AverageDistanceMoved));
-				RaisePropertyChanged(nameof(LargestDistanceMoved));
 			}
 		}
 
@@ -60,12 +57,6 @@ namespace FitnessTracker.ViewModels
 		public double? LowestWeight => _summaryStatistics?.LowestWeight;
 
 		public double? HighestWeight => _summaryStatistics?.HighestWeight;
-
-		public double? TotalDistanceMoved => _summaryStatistics?.TotalDistanceMoved;
-
-		public double? AverageDistanceMoved => _summaryStatistics?.AverageDistanceMoved;
-		
-		public double? LargestDistanceMoved => _summaryStatistics?.LargestDistanceMoved;
 
 		public SystemSettings SystemSettings
 		{

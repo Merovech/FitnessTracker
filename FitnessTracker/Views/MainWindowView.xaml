@@ -64,12 +64,7 @@
 							</TextBlock>
 						</Border>
 						<Grid Visibility="{Binding CanShowGraphs, Converter={StaticResource TrueToVisibleConverter}}">
-							<Grid.RowDefinitions>
-								<RowDefinition />
-								<RowDefinition />
-							</Grid.RowDefinitions>
-							<v:WeightChartView Grid.Row="0"/>
-							<v:MovementChartView Grid.Row="1" />
+							<v:WeightChartView />
 						</Grid>
 					</Grid>
 					<Grid Visibility="{Binding IsChecked, ElementName=rbTab2, Converter={StaticResource TrueToVisibleConverter}}">

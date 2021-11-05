@@ -14,7 +14,6 @@ namespace FitnessTracker.Services.Implementations
 		{
 			var dataList = data.ToList();
 			FillMovingWeightAverage(dataList);
-			FillAverageDistanceMoved(dataList);
 		}
 
 		public SummaryStatistics CalculateSummaryStatistics(IEnumerable<DailyRecord> data)
@@ -27,27 +26,12 @@ namespace FitnessTracker.Services.Implementations
 
 			var dataList = data.ToList();
 			var startingWeight = dataList.FirstOrDefault().Weight;
-			var maxDistanceRecord = new DailyRecord { Id = 0, Weight = 0, DistanceMoved = double.MinValue };
 			var lowestWeightRecord = new DailyRecord { Id = 0, Weight = 0, MovingWeightAverage = double.MaxValue };
 			var highestWeightRecord = new DailyRecord { Id = 0, Weight = 0, MovingWeightAverage = double.MinValue };
 
 			for (int i = 0; i < dataList.Count; i++)
 			{
 				var item = dataList[i];
-
-				// Edge case: adding a double to a double? with a value of null yields null, so initialize the double? to 0 first
-				if (!retVal.TotalDistanceMoved.HasValue && item.DistanceMoved.HasValue)
-				{
-					retVal.TotalDistanceMoved = 0.0;
-				}
-
-				var distanceMoved = item.DistanceMoved.GetValueOrDefault();
-				retVal.TotalDistanceMoved += distanceMoved;
-
-				if (distanceMoved > maxDistanceRecord.DistanceMoved.GetValueOrDefault())
-				{
-					maxDistanceRecord = item;
-				}
 
 				if (item.MovingWeightAverage < lowestWeightRecord.MovingWeightAverage)
 				{
@@ -57,13 +41,6 @@ namespace FitnessTracker.Services.Implementations
 				if (item.MovingWeightAverage > highestWeightRecord.MovingWeightAverage)
 				{
 					highestWeightRecord = item;
-				}
-
-				// Since Average Distance Moved is cumulative (the value being the average of all previous values), the latest one that isn't null
-				// is the target summary value.  The easiest way to do this is just to keep track of the latest one that isn't null as we iterate.
-				if (item.AverageDistanceMoved != null)
-				{
-					retVal.AverageDistanceMoved = item.AverageDistanceMoved.GetValueOrDefault();
 				}
 
 				// Current weight is the latest Moving Average value.  If there is no moving average yet, get the last current weight.
@@ -96,12 +73,6 @@ namespace FitnessTracker.Services.Implementations
 				retVal.HighestWeightDate = highestWeightRecord.Date;
 			}
 
-			if (maxDistanceRecord.DistanceMoved.HasValue && maxDistanceRecord.DistanceMoved > double.MinValue)
-			{
-				retVal.LargestDistanceMoved = maxDistanceRecord.DistanceMoved.GetValueOrDefault();
-				retVal.LargestDistanceMovedDate = maxDistanceRecord.Date;
-			}
-
 			CleanupCalculatedValues(retVal);
 
 			return retVal;
@@ -124,32 +95,12 @@ namespace FitnessTracker.Services.Implementations
 			}
 		}
 
-		private void FillAverageDistanceMoved(List<DailyRecord> data)
-		{
-			var totalDistanceMoved = 0.0d;
-			var nullDistanceDays = 0;
-
-			for (int i = 0; i < data.Count; i++)
-			{
-				if (data[i].DistanceMoved == null)
-				{
-					nullDistanceDays++;
-				}
-				else
-				{
-					totalDistanceMoved += data[i].DistanceMoved.Value;
-					data[i].AverageDistanceMoved = Math.Round(totalDistanceMoved / (i + 1 - nullDistanceDays), 2);
-				}
-			}
-		}
-
 		private void CleanupCalculatedValues(SummaryStatistics statistics)
 		{
 			// Since we're dealing with doubles, the math can give weird answers like "average = 1.000000000000009".
-			// So we'll round all weight values to the nearest tenth and distances to the nearest hundredth for calculated fields.
+			// So we'll round all weight values to the nearest tenth.
 			// For the purposes of this method, "calculated values" are:
 			// TotalWeightChange
-			// TotalDistanceMoved
 			// WeightChangeSincePrevious
 
 			if (statistics.TotalWeightChange.HasValue)
@@ -160,11 +111,6 @@ namespace FitnessTracker.Services.Implementations
 			if (statistics.WeightChangeSincePrevious.HasValue)
 			{
 				statistics.WeightChangeSincePrevious = Math.Round(statistics.WeightChangeSincePrevious.Value, 1);
-			}
-
-			if (statistics.TotalDistanceMoved.HasValue)
-			{
-				statistics.TotalDistanceMoved = Math.Round(statistics.TotalDistanceMoved.Value, 1);
 			}
 		}
 	}

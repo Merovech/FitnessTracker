@@ -6,7 +6,6 @@
 			 xmlns:e="clr-namespace:FitnessTracker.Extensions"
 			 xmlns:m="clr-namespace:FitnessTracker.Models"
 			 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:local="clr-namespace:FitnessTracker.Views"
              mc:Ignorable="d" 
 			 DataContext="{Binding Source={StaticResource Locator}, Path=SettingsViewModel}"
              d:DesignHeight="400" d:DesignWidth="400">
@@ -21,142 +20,80 @@
 				<RowDefinition Height="10" />
 				<RowDefinition Height="Auto" />
 			</Grid.RowDefinitions>
-			<GroupBox Header="Units" Grid.Row="0">
-				<Grid>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto" />
-						<RowDefinition Height="5" />
-						<RowDefinition Height="Auto" />
-					</Grid.RowDefinitions>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto" />
-						<ColumnDefinition Width="5" />
-						<ColumnDefinition Width="80" />
-					</Grid.ColumnDefinitions>
-					<TextBlock Grid.Column="0" 
+			<GroupBox Header="Settings" Grid.Row="0">
+				<StackPanel>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="5" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="5" />
+							<ColumnDefinition Width="80" />
+						</Grid.ColumnDefinitions>
+						<TextBlock Grid.Column="0" 
 							   Grid.Row="0" 
 							   VerticalAlignment="Center" 
-							   FontSize="16" 
-							   FontWeight="Bold"
-							   Text="Weight" />
-					<ComboBox Grid.Row="0" 
+
+							   Text="Units:" />
+						<ComboBox Grid.Row="0" 
 							  Grid.Column="2" 
 							  ItemsSource="{Binding Source={e:EnumBindingSource {x:Type m:WeightUnit}}}" 
 							  SelectedItem="{Binding SystemSettings.WeightUnit, FallbackValue={x:Static m:WeightUnit.Pounds}}"/>
+					</Grid>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="25" />
+							<RowDefinition Height="25" />
 
-					<TextBlock Grid.Column="0" 
-							   Grid.Row="2" 
-							   VerticalAlignment="Center" 
-							   FontSize="16" 
-							   FontWeight="Bold" 
-							   Text="Distance" />
-					<ComboBox Grid.Row="2" 
-							  Grid.Column="2" 
-							  ItemsSource="{Binding Source={e:EnumBindingSource {x:Type m:DistanceUnit}}}" 
-							  SelectedItem="{Binding SystemSettings.DistanceUnit, FallbackValue={x:Static m:DistanceUnit.Miles}}"/>
-				</Grid>
-			</GroupBox>
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="8" />
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="8" />
+							<ColumnDefinition Width="50" />
+						</Grid.ColumnDefinitions>
 
-			<GroupBox Header="Charts" Grid.Row="2">
-				<Grid>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto" />
-						<RowDefinition Height="25" />
-						<RowDefinition Height="25" />
-						<RowDefinition Height="5" />
-						<RowDefinition Height="Auto" />
-						<RowDefinition Height="25" />
-						<RowDefinition Height="25" />
-					</Grid.RowDefinitions>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto" />
-						<ColumnDefinition Width="8" />
-						<ColumnDefinition Width="Auto" />
-						<ColumnDefinition Width="8" />
-						<ColumnDefinition Width="50" />
-					</Grid.ColumnDefinitions>
 
-					<TextBlock Grid.Column="0" 
-							   Grid.ColumnSpan="4" 
-							   Grid.Row="0" 
-							   VerticalAlignment="Center" 
-							   FontSize="16" 
-							   FontWeight="Bold"
-							   Text="Weight Graph" />
-
-					<TextBlock Grid.Column="0" 
+						<TextBlock Grid.Column="0" 
 							   Grid.Row="1" 
 							   VerticalAlignment="Center">
-						Specify my own minimum value.
-					</TextBlock>
-					<ToggleButton Grid.Column="2" 
+						Specify minimum graph value.
+						</TextBlock>
+						<ToggleButton Grid.Column="2" 
 								  Grid.Row="1" 
 								  Name="WeightMinOverride" 
 								  Style="{DynamicResource MaterialDesignSwitchToggleButton}" 
 								  IsChecked="{Binding OverrideWeightGraphMinimum}"/>
-					<TextBox Grid.Column="4" 
+						<TextBox Grid.Column="4" 
 							 Grid.Row="1" 
 							 Width="50" 
 							 Visibility="{Binding ElementName=WeightMinOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
 							 Text="{Binding WeightGraphMinimum, FallbackValue=0, ValidatesOnDataErrors=True}"/>
 
-					<TextBlock Grid.Column="0" 
+						<TextBlock Grid.Column="0" 
 							   Grid.Row="2" 
 							   VerticalAlignment="Center">
-						Specify my own maximum value.
-					</TextBlock>
-					<ToggleButton Grid.Column="2" 
+						Specify maximum graph value.
+						</TextBlock>
+						<ToggleButton Grid.Column="2" 
 								  Grid.Row="2" 
 								  Name="WeightMaxOverride" 
 								  Style="{DynamicResource MaterialDesignSwitchToggleButton}" 
 								  IsChecked="{Binding OverrideWeightGraphMaximum}"/>
-					<TextBox Grid.Column="4" 
+						<TextBox Grid.Column="4" 
 							 Grid.Row="2" 
 							 Width="50" 
 							 Visibility="{Binding ElementName=WeightMaxOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
 							 Text="{Binding WeightGraphMaximum, FallbackValue=0, ValidatesOnDataErrors=True}"/>
-
-					<TextBlock Grid.Column="0" 
-							   Grid.ColumnSpan="4"
-							   Grid.Row="4" 
-							   VerticalAlignment="Center" 
-							   FontSize="16" 
-							   FontWeight="Bold" 
-							   Text="Distance Graph" />
-
-					<TextBlock Grid.Column="0" 
-							   Grid.Row="5" 
-							   VerticalAlignment="Center">
-						Specify my own minimum value.
-					</TextBlock>
-					<ToggleButton Grid.Column="2" 
-								  Grid.Row="5" 
-								  Name="DistanceMinOverride" 
-								  Style="{DynamicResource MaterialDesignSwitchToggleButton}" 
-								  IsChecked="{Binding OverrideDistanceGraphMinimum}" />
-					<TextBox Grid.Column="4" 
-							 Grid.Row="5" 
-							 Width="50"
-							 Visibility="{Binding ElementName=DistanceMinOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
-							 Text="{Binding DistanceGraphMinimum, FallbackValue=0, ValidatesOnDataErrors=True}"/>
-
-					<TextBlock Grid.Column="0" 
-							   Grid.Row="6" 
-							   VerticalAlignment="Center">
-						Specify my own maximum value.
-					</TextBlock>
-					<ToggleButton Grid.Column="2" 
-								  Grid.Row="6" 
-								  Name="DistanceMaxOverride" 
-								  Style="{DynamicResource MaterialDesignSwitchToggleButton}" 
-								  IsChecked="{Binding OverrideDistanceGraphMaximum}"/>
-					<TextBox Grid.Column="4" 
-							 Grid.Row="6" 
-							 Width="50"
-							 Visibility="{Binding ElementName=DistanceMaxOverride, Path=IsChecked, Converter={StaticResource TrueToVisibleConverter}}"
-							 Text="{Binding DistanceGraphMaximum, FallbackValue=0, ValidatesOnDataErrors=True}"/>
-				</Grid>
+					</Grid>
+				</StackPanel>
 			</GroupBox>
+
 			<StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Center">
 				<Button IsDefault="True" 
 						Style="{DynamicResource MaterialDesignFlatButton}"

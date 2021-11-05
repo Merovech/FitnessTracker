@@ -7,10 +7,4 @@ namespace FitnessTracker.Models
 		Pounds,
 		Kilograms
 	}
-
-	public enum DistanceUnit
-	{
-		Miles,
-		Kilometers
-	}
 }
