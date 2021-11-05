@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using FitnessTracker.Views;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FitnessTracker
@@ -45,18 +44,19 @@ namespace FitnessTracker
 
 			foreach (var t in types)
 			{
-				if (t.IsSubclassOf(typeof(DbContext)) || t.Name.EndsWith("ViewModel"))
+				if (t.Name.EndsWith("ViewModel", StringComparison.OrdinalIgnoreCase))
 				{
-					// Register VMs and DbContexts straightaway.  No further processing needed.
-					Debug.WriteLine($"Registering type: {t.Name}");
+					Debug.WriteLine($"Registering view model: {t.Name}.");
 					serviceCollection.AddTransient(t);
 				}
-				else if (t.IsInterface && t.Name.EndsWith("Service"))
+				else if (t.IsInterface && t.Name.EndsWith("Service", StringComparison.OrdinalIgnoreCase))
 				{
+					Debug.WriteLine($"Registering service interface: {t.Name}.");
 					serviceInterfaces.Add(t);
 				}
-				else if (!t.IsInterface && t.Name.EndsWith("Service"))
+				else if (!t.IsInterface && t.Name.EndsWith("Service", StringComparison.OrdinalIgnoreCase))
 				{
+					Debug.WriteLine($"Registering service: {t.Name}.");
 					serviceImplementations.Add(t);
 				}
 

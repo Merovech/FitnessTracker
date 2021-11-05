@@ -7,18 +7,12 @@ namespace FitnessTracker.Services.Interfaces
 {
 	public interface IDatabaseService
 	{
-		Task<DailyRecord> Get(DateTime recordDate);
+		Task<DailyRecord> GetRecordByDate(DateTime recordDate);
 
-		IEnumerable<DailyRecord> GetRange(DateTime startDate, DateTime endDate);
+		Task<IEnumerable<DailyRecord>> GetAllRecords();
 
-		IEnumerable<DailyRecord> GetTo(DateTime endDate);
+		Task UpsertRecord(DateTime date, double weight);
 
-		IEnumerable<DailyRecord> GetSince(DateTime startDate);
-
-		Task<IEnumerable<DailyRecord>> GetAll();
-
-		Task Upsert(DateTime date, double weight);
-
-		Task BulkAddAsync(IEnumerable<DailyRecord> records);
+		Task AddRecordsAsync(IEnumerable<DailyRecord> records);
 	}
 }

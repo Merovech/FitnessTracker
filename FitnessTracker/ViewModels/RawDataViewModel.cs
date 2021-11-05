@@ -32,7 +32,7 @@ namespace FitnessTracker.ViewModels
 
 		private async Task RefreshData()
 		{
-			var newData = await _databaseService.GetAll();
+			var newData = await _databaseService.GetAllRecords();
 			Data = new ObservableCollection<DailyRecord>(newData);
 
 			MessengerInstance.Send(new DataRetrievedMessage(newData));

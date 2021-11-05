@@ -59,14 +59,14 @@ namespace FitnessTracker.ViewModels
 		private async Task RetrieveRecord()
 		{
 			IsIdle = false;
-			var record = await _databaseService.Get(_date);
+			var record = await _databaseService.GetRecordByDate(_date);
 			Weight = record == null ? 0 : record.Weight;
 			IsIdle = true;
 		}
 
 		private async Task Upsert()
 		{
-			await _databaseService.Upsert(Date, Weight.Value);
+			await _databaseService.UpsertRecord(Date, Weight.Value);
 			MessengerInstance.Send(new NewDataAvailableMessage());
 		}
 	}
