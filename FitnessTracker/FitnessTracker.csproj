@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <StartupObject>FitnessTracker.App</StartupObject>
     <ApplicationIcon>Icons8-Windows-8-Sports-Running-Man.ico</ApplicationIcon>
