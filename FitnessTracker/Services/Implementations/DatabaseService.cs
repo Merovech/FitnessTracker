@@ -81,7 +81,7 @@ namespace FitnessTracker.Services.Implementations
 						await transaction.CommitAsync();
 					}
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					await transaction.RollbackAsync();
 				}
