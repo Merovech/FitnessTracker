@@ -45,14 +45,51 @@ namespace FitnessTracker.Services.Implementations
 			return new DailyRecord { Id = reader.GetInt32(0), Date = reader.GetDateTime(1), Weight = reader.GetDouble(2) };
 		}
 
-		public Task UpsertRecord(DateTime date, double weight)
+		public async Task UpsertRecord(DateTime date, double weight)
 		{
-			throw new NotImplementedException();
+			var existingRecord = GetRecordByDate(date);
+			var command = new SqliteCommand();
+			if (existingRecord == null)
+			{
+				command.CommandText = INSERT_QUERY;
+			}
+			else
+			{
+				command.CommandText = UPDATE_QUERY;				
+			}
+
+			command.Parameters.AddWithValue("@Date", date);
+			command.Parameters.AddWithValue("@Weight", weight);
+			await ExecuteNonReaderCommand(command);
+
 		}
 
-		public Task AddRecordsAsync(IEnumerable<DailyRecord> records)
+		public async Task AddRecordsAsync(IEnumerable<DailyRecord> records)
 		{
-			throw new NotImplementedException();
+			using (SqliteConnection conn = new SqliteConnection())
+			{
+				conn.Open();
+				var transaction = conn.BeginTransaction();
+				try
+				{
+					foreach (var record in records)
+					{
+						var command = new SqliteCommand(INSERT_QUERY);
+						command.Parameters.AddWithValue("@Date", record.Date);
+						command.Parameters.AddWithValue("@Weight", record.Weight);
+						await command.ExecuteNonQueryAsync();
+						await transaction.CommitAsync();
+					}
+				}
+				catch (Exception ex)
+				{
+					await transaction.RollbackAsync();
+				}
+				finally
+				{
+					await conn.CloseAsync();
+				}
+			}
 		}
 
 		private async Task<SqliteDataReader> ExecuteReaderCommand(SqliteCommand command)
@@ -61,15 +98,20 @@ namespace FitnessTracker.Services.Implementations
 			{
 				conn.Open();
 				var result = await command.ExecuteReaderAsync();
-				conn.Close();
+				await conn.CloseAsync();
 
 				return result;
 			}
 		}
 
-		private DailyRecord ConvertToRecord()
+		private async Task ExecuteNonReaderCommand(SqliteCommand command)
 		{
-			return null;
+			using (SqliteConnection conn = new SqliteConnection())
+			{
+				conn.Open();
+				await command.ExecuteNonQueryAsync();
+				await conn.CloseAsync();
+			}
 		}
 	}
 }
