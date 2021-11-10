@@ -33,7 +33,7 @@ namespace FitnessTracker.Services.Implementations
 				recordsToAdd.Add(ConvertToDailyRecord(line.Split(',')));
 			}
 
-			await _databaseService.BulkAddAsync(recordsToAdd);
+			await _databaseService.AddRecordsAsync(recordsToAdd);
 		}
 
 		private DailyRecord ConvertToDailyRecord(string[] rawData)

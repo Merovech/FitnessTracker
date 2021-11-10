@@ -1,77 +1,146 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FitnessTracker.Models;
 using FitnessTracker.Services.Interfaces;
 using FitnessTracker.Utilities;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 
 namespace FitnessTracker.Services.Implementations
 {
 	public class DatabaseService : IDatabaseService
 	{
-		private DatabaseContext _context;
-		private IDataCalculatorService _dataCalculatorService;
+		private const string GET_ALL_QUERY = "SELECT * FROM Records";
+		private const string GET_SINGLE_QUERY = "SELECT * FROM Records WHERE Date=@Date";
+		private const string UPDATE_QUERY = "UPDATE Records SET Weight=@Weight WHERE Date=@Date";
+		private const string INSERT_QUERY = "INSERT INTO Records (Date, Weight) VALUES (@Date, @Weight)";
+		private IConfigurationService _configService;
 
-		public DatabaseService(DatabaseContext context, IDataCalculatorService dataCalculatorService)
+		public DatabaseService(IConfigurationService configService)
 		{
-			Guard.AgainstNull(context, nameof(context));
-			Guard.AgainstNull(dataCalculatorService, nameof(dataCalculatorService));
-
-			_context = context;
-			_dataCalculatorService = dataCalculatorService;
+			Guard.AgainstNull(configService, nameof(configService));
+			_configService = configService;
 		}
 
-		public async Task BulkAddAsync(IEnumerable<DailyRecord> records)
+		public async Task<IEnumerable<DailyRecord>> GetAllRecords()
 		{
-			await _context.AddRangeAsync(records);
-			_context.SaveChanges();
-		}
-
-		public async Task Upsert(DateTime date, double weight)
-		{
-			var existingRecord = await _context.Records.FirstOrDefaultAsync(x => x.Date == date);
-			if (existingRecord == null)
+			using (SqliteConnection conn = new SqliteConnection(_configService.DatabaseConnectionString))
 			{
-				_context.Records.Add(new DailyRecord { Date = date, Weight = weight});
+				var command = new SqliteCommand(GET_ALL_QUERY, conn);
+
+				await conn.OpenAsync();
+				var reader = await command.ExecuteReaderAsync();
+
+				var records = new List<DailyRecord>();
+				if (!reader.HasRows)
+				{
+					return new List<DailyRecord>();
+				}
+
+				while (await reader.ReadAsync())
+				{
+					var record = new DailyRecord()
+					{
+						Id = reader.GetInt32(0),
+						Date = reader.GetDateTime(1),
+						Weight = reader.GetDouble(2)
+					};
+
+					records.Add(record);
+				}
+
+				return records;
 			}
-			else
+		}
+
+		public async Task<DailyRecord> GetRecordByDate(DateTime recordDate)
+		{
+			using (SqliteConnection conn = new SqliteConnection(_configService.DatabaseConnectionString))
 			{
-				var entry = _context.Entry(existingRecord);
-				entry.Entity.Weight = weight;
-				entry.State = EntityState.Modified;
+				var command = new SqliteCommand(GET_SINGLE_QUERY, conn);
+				command.Parameters.AddWithValue("@Date", recordDate);
+
+				await conn.OpenAsync();
+				var reader = await command.ExecuteReaderAsync();
+				
+				if (!reader.HasRows)
+				{
+					return null;
+				}
+
+				await reader.ReadAsync();
+				return new DailyRecord { Id = reader.GetInt32(0), Date = reader.GetDateTime(1), Weight = reader.GetDouble(2) };
 			}
-
-			await _context.SaveChangesAsync();
 		}
 
-		public async Task<DailyRecord> Get(DateTime recordDate)
+		public async Task UpsertRecord(DateTime date, double weight)
 		{
-			return await Task.Run(() => _context.Records.Where(r => r.Date == recordDate).FirstOrDefault());
+			var existingRecord = await GetRecordByDate(date);
+			using (SqliteConnection conn = new SqliteConnection(_configService.DatabaseConnectionString))
+			{
+				var cmdText = string.Empty;
+				if (existingRecord == null)
+				{
+					cmdText = INSERT_QUERY;
+				}
+				else
+				{
+					cmdText = UPDATE_QUERY;
+				}
+
+				var command = new SqliteCommand(cmdText, conn);
+				command.Parameters.AddWithValue("@Date", date);
+				command.Parameters.AddWithValue("@Weight", weight);
+				
+				await conn.OpenAsync();
+				await command.ExecuteNonQueryAsync();
+			}
 		}
 
-		public async Task<IEnumerable<DailyRecord>> GetAll()
+		public async Task AddRecordsAsync(IEnumerable<DailyRecord> records)
 		{
-			var rawData = await _context.Records.AsNoTracking().ToListAsync();
-			rawData = rawData.OrderBy(item => item.Date).ToList();
-			_dataCalculatorService.FillCalculatedDataFields(rawData);
-			return rawData;
+			using (SqliteConnection conn = new SqliteConnection(_configService.DatabaseConnectionString))
+			{
+				await conn.OpenAsync();
+				var transaction = conn.BeginTransaction();
+				try
+				{
+					foreach (var record in records)
+					{
+						var command = new SqliteCommand(INSERT_QUERY, conn, transaction);
+						command.Parameters.AddWithValue("@Date", record.Date);
+						command.Parameters.AddWithValue("@Weight", record.Weight);
+						await command.ExecuteNonQueryAsync();
+					}
+
+					await transaction.CommitAsync();
+				}
+				catch (Exception)
+				{
+					await transaction.RollbackAsync();
+				}
+			}
 		}
 
-		public IEnumerable<DailyRecord> GetRange(DateTime startDate, DateTime endDate)
+		public async Task CreateDatabase()
 		{
-			throw new NotImplementedException();
-		}
+			using (SqliteConnection conn = new SqliteConnection(_configService.DatabaseConnectionString))
+			{		
+				var command = new SqliteCommand();
+				command.Connection = conn;
+				await conn.OpenAsync();
 
-		public IEnumerable<DailyRecord> GetSince(DateTime startDate)
-		{
-			throw new NotImplementedException();
-		}
+				command.CommandText = "PRAGMA journal_mode=DELETE";
+				await command.ExecuteNonQueryAsync();
 
-		public IEnumerable<DailyRecord> GetTo(DateTime endDate)
-		{
-			throw new NotImplementedException();
+				command.CommandText = @"CREATE TABLE ""Records"" (
+											""Id"" INTEGER NOT NULL CONSTRAINT ""PK_Records"" PRIMARY KEY AUTOINCREMENT,
+											""Date"" TEXT NOT NULL,
+											""Weight"" REAL NOT NULL
+										)";
+				
+				await command.ExecuteNonQueryAsync();
+			}
 		}
 	}
 }
