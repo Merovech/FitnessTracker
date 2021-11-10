@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
+using FitnessTracker.Services.Interfaces;
 using FitnessTracker.Views;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FitnessTracker
 {
-	/// <summary>
-	/// Interaction logic for App.xaml
-	/// </summary>
 	public partial class App : Application
 	{
 		public static ServiceProvider ServiceProvider;
@@ -20,6 +20,7 @@ namespace FitnessTracker
 			var serviceCollection = new ServiceCollection();
 			RegisterInjectables(serviceCollection);
 			ServiceProvider = serviceCollection.BuildServiceProvider();
+			Task.Run(async () => await VerifyOrCreateDatabase()).Wait();
 		}
 
 		private void OnStartup(object sender, StartupEventArgs e)
@@ -74,6 +75,15 @@ namespace FitnessTracker
 			{
 				Debug.WriteLine($"Registering service: {interfaces[i].Name}, {implementations[i].Name}");
 				serviceCollection.AddTransient(interfaces[i], implementations[i]);
+			}
+		}
+
+		private async Task VerifyOrCreateDatabase()
+		{
+			if (!File.Exists("data.dat"))
+			{
+				var dbService = ServiceProvider.GetService<IDatabaseService>();
+				await dbService.CreateDatabase();
 			}
 		}
 	}
