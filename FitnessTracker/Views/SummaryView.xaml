@@ -65,7 +65,7 @@
 
 				<StackPanel Grid.Row="9" Margin="0 5 0 0">
 					<Separator />
-					<TextBlock Foreground="{DynamicResource SecondaryHueDarkBrush}" TextWrapping="Wrap" Margin="0 5 0 0">
+					<TextBlock Foreground="{DynamicResource MaterialDesignBody}" TextWrapping="Wrap" Margin="0 5 0 0">
 					Based on a 5-day average.   Data will not show up until there are at least 5 days entered.
 					</TextBlock>
 				</StackPanel>
