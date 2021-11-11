@@ -117,8 +117,8 @@ namespace FitnessTracker.ViewModels
 			var settings = new SystemSettings
 			{
 				WeightUnit = SystemSettings.WeightUnit,
-				WeightGraphMinimum = OverrideWeightGraphMinimum ? (double?)WeightGraphMinimum : null,
-				WeightGraphMaximum = OverrideWeightGraphMaximum ? (double?)WeightGraphMaximum : null,
+				WeightGraphMinimum = OverrideWeightGraphMinimum ? WeightGraphMinimum : null,
+				WeightGraphMaximum = OverrideWeightGraphMaximum ? WeightGraphMaximum : null,
 			};
 
 			_settingsService.SaveSettings(settings);

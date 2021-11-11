@@ -15,11 +15,13 @@ namespace FitnessTracker.Models
 
 		public double? WeightGraphMaximum { get; set; }
 
+		public bool IsDarkTheme { get; set; }
+
 		public string ToDebugString()
 		{
 			var weightMin = WeightGraphMinimum.HasValue ? WeightGraphMinimum.Value.ToString() : "(null)";
 			var weightMax = WeightGraphMaximum.HasValue ? WeightGraphMaximum.Value.ToString() : "(null)";
-			return $"WeightUnit={WeightUnit}, WeightGraphMinimum={weightMin}, WeightGraphMaximum={weightMax}";
+			return $"DarkTheme={IsDarkTheme}, WeightUnit={WeightUnit}, WeightGraphMinimum={weightMin}, WeightGraphMaximum={weightMax}";
 		}
 	}
 }

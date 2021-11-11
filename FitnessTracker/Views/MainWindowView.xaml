@@ -22,7 +22,7 @@
 		<DockPanel>
 			<v:SummaryView DockPanel.Dock="Right" />
 
-			<Grid Grid.Row="2">
+			<Grid>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="38"/>
 					<RowDefinition Height="60"/>
@@ -39,6 +39,13 @@
 							<RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" x:Name="rbTab2" Margin="4" Content="RAW DATA"/>
 						</StackPanel>
 						<StackPanel Orientation="Horizontal" Grid.Column="1">
+							<StackPanel Orientation="Horizontal" Margin="0 0 10 0">
+								<TextBlock Margin="0 0 5 0" VerticalAlignment="Center">Theme:</TextBlock>
+								<materialDesign:PackIcon Kind="WhiteBalanceSunny" VerticalAlignment="Center" Height="20" Width="20" />
+								<ToggleButton Margin="5 0 -5 0" IsChecked="{Binding IsDarkTheme}"/>
+								<materialDesign:PackIcon Kind="MoonWaxingCrescent" VerticalAlignment="Center" Height="18" Width="18" />
+							</StackPanel>
+							<Rectangle Margin="0 0 10 0" Width="2" Height="38" Fill="{StaticResource AttentionToActionBrush}"/>
 							<Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ImportCommand}" Foreground="{DynamicResource MaterialDesignDarkForeground}" Padding="0" ToolTip="Import Data">
 								<Button.Content>
 									<materialDesign:PackIcon Kind="Import" Height="32" Width="32"/>
