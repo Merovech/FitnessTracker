@@ -25,7 +25,7 @@ namespace FitnessTracker.Services.Implementations
 
 		public SystemSettings ReadSettings()
 		{
-			SystemSettings returnSettings = null;
+			SystemSettings returnSettings;
 			if (!File.Exists(FILENAME))
 			{
 				// No settings file, so create one with some basic defaults
@@ -35,7 +35,6 @@ namespace FitnessTracker.Services.Implementations
 			{
 				var fileContents = File.ReadAllText(FILENAME);
 				returnSettings = JsonSerializer.Deserialize<SystemSettings>(fileContents, _serializationOptions);
-
 			}
 
 			Debug.WriteLine(returnSettings.ToDebugString());
