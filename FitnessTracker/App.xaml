@@ -10,7 +10,7 @@
             <!-- Uncomment for compiler failure do to BundledTheme not being found in the namespace -->
             <!-- In version 3.2.0 you can set BaseTheme to Inherit and on Windows 10, it will go light or Dark theme based on the user's Windows theme -->
             <ResourceDictionary.MergedDictionaries>
-                <materialDesign:BundledTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Amber" />
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="Blue" SecondaryColor="LightBlue" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
             </ResourceDictionary.MergedDictionaries>
             
