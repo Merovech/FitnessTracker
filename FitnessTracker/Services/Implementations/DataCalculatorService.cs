@@ -8,7 +8,7 @@ namespace FitnessTracker.Services.Implementations
 {
 	public class DataCalculatorService : IDataCalculatorService
 	{
-		private int _averageWindowInDays = 5;
+		private const int _averageWindowInDays = 5;
 
 		public void FillCalculatedDataFields(IEnumerable<DailyRecord> data)
 		{

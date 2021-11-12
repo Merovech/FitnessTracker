@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using FitnessTracker.Services.Interfaces;
+using FitnessTracker.Utilities.ImportPreparer.Implementations;
+using FitnessTracker.Utilities.ImportPreparer.Interfaces;
 using FitnessTracker.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +15,9 @@ namespace FitnessTracker
 {
 	public partial class App : Application
 	{
-		public static ServiceProvider ServiceProvider;
+		public static ServiceProvider ServiceProvider {
+			get; private set;
+		}
 
 		public App()
 		{
@@ -43,6 +47,10 @@ namespace FitnessTracker
 			var mainViewModel = types.FirstOrDefault(t => t.Name == nameof(MainWindowView));
 			serviceCollection.AddSingleton(mainViewModel);
 
+			// One-offs - not really a service, so looping through services and view models would catch these
+			serviceCollection.AddTransient<IImportPreparerFactory, ImportPreparerFactory>();
+
+			// ViewModels and Services
 			foreach (var t in types)
 			{
 				if (t.Name.EndsWith("ViewModel", StringComparison.OrdinalIgnoreCase))

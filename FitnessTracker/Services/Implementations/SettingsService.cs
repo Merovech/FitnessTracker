@@ -11,7 +11,7 @@ namespace FitnessTracker.Services.Implementations
 	{
 		private const string FILENAME = "settings.json";
 
-		private JsonSerializerOptions _serializationOptions;
+		private readonly JsonSerializerOptions _serializationOptions;
 
 		public SettingsService()
 		{
