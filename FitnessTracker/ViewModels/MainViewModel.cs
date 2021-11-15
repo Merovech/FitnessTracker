@@ -15,7 +15,7 @@ namespace FitnessTracker.ViewModels
 		private readonly ISettingsService _settingsService;
 		private bool _isDarkTheme;
 
-		private const string IMPORT_FILE_FILTER = "Comma-Separated Files|*.csv";
+		private const string IMPORT_FILE_FILTER = "Comma-Separated Files|*.csv|FitnessTracker Files|*.dat";
 
 		private bool _canShowGraphs;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using FitnessTracker.Models;
 using FitnessTracker.Utilities.ImportPreparer.Interfaces;
 
@@ -8,7 +9,7 @@ namespace FitnessTracker.Utilities.ImportPreparer.Implementations
 {
 	public class CsvImportPreparer : IImportPreparer
 	{
-		public IEnumerable<DailyRecord> GetRecords(string fileName)
+		public Task<IEnumerable<DailyRecord>> GetRecords(string fileName)
 		{
 			var allLines = File.ReadAllLines(fileName);
 			var returnList = new List<DailyRecord>();
@@ -18,7 +19,7 @@ namespace FitnessTracker.Utilities.ImportPreparer.Implementations
 				returnList.Add(ConvertToDailyRecord(line.Split(',')));
 			}
 
-			return returnList;
+			return Task.FromResult((IEnumerable<DailyRecord>)returnList);
 		}
 
 		private DailyRecord ConvertToDailyRecord(string[] rawData)

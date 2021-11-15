@@ -35,7 +35,7 @@ namespace FitnessTracker.Services.Implementations
 				throw new InvalidOperationException($"Could not find an appropriate import preparer for '{filePath}'.");
 			}
 
-			var records = importPreparer.GetRecords(filePath);
+			var records = await importPreparer.GetRecords(filePath);
 			await _databaseService.UpsertRecords(records);
 		}
 
