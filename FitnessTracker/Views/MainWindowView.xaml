@@ -16,9 +16,6 @@
         DataContext="{Binding Source={StaticResource Locator}, Path=MainViewModel}"
         Title="Fitness Tracker" Height="1000" Width="1600">
 	<materialDesign:DialogHost>
-		<materialDesign:DialogHost.DialogContent>
-			<v:SettingsView />
-		</materialDesign:DialogHost.DialogContent>
 		<DockPanel>
 			<v:SummaryView DockPanel.Dock="Right" />
 
@@ -46,12 +43,18 @@
 								<materialDesign:PackIcon Kind="MoonWaxingCrescent" VerticalAlignment="Center" Height="18" Width="18" />
 							</StackPanel>
 							<Rectangle Margin="0 0 10 0" Width="2" Height="38" Fill="{StaticResource AttentionToActionBrush}"/>
-							<Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ImportCommand}" Foreground="{DynamicResource MaterialDesignDarkForeground}" Padding="0" ToolTip="Import Data">
+							<Button Style="{StaticResource MaterialDesignFlatButton}" Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}" Foreground="{DynamicResource MaterialDesignDarkForeground}" Padding="0" ToolTip="Import Data">
+								<Button.CommandParameter>
+									<v:ImportView />
+								</Button.CommandParameter>
 								<Button.Content>
 									<materialDesign:PackIcon Kind="Import" Height="32" Width="32"/>
 								</Button.Content>
 							</Button>
 							<Button Style="{StaticResource MaterialDesignFlatButton}" Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}" Foreground="{DynamicResource MaterialDesignDarkForeground}" Margin="0 0 5 0" Padding="0" ToolTip="Settings">
+								<Button.CommandParameter>
+									<v:SettingsView />
+								</Button.CommandParameter>
 								<Button.Content>
 									<materialDesign:PackIcon Kind="CogOutline" Height="32" Width="32"/>
 								</Button.Content>

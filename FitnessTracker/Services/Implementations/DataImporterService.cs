@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using FitnessTracker.Services.Interfaces;
 using FitnessTracker.Utilities;
@@ -22,7 +23,7 @@ namespace FitnessTracker.Services.Implementations
 			_importPreparerFactory = importPreparerFactory;
 		}
 
-		public async Task ImportData(string filePath)
+		public async Task<int> ImportData(string filePath)
 		{
 			if (!File.Exists(filePath))
 			{
@@ -37,6 +38,8 @@ namespace FitnessTracker.Services.Implementations
 
 			var records = await importPreparer.GetRecords(filePath);
 			await _databaseService.UpsertRecords(records);
+
+			return records.Count();
 		}
 
 		private FileType GetFileType(string filePath)

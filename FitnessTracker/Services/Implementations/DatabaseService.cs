@@ -131,6 +131,7 @@ namespace FitnessTracker.Services.Implementations
 					Debug.WriteLine("ERROR: " + ex.Message);
 					Debug.WriteLine("Rolling back transaction.");
 					transaction.Rollback();
+					throw;
 				}
 			}
 		}
