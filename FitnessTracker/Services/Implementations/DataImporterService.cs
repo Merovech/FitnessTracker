@@ -1,68 +1,55 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using FitnessTracker.Models;
 using FitnessTracker.Services.Interfaces;
 using FitnessTracker.Utilities;
+using FitnessTracker.Utilities.ImportPreparer;
+using FitnessTracker.Utilities.ImportPreparer.Interfaces;
 
 namespace FitnessTracker.Services.Implementations
 {
 	public class DataImporterService : IDataImporterService
 	{
 		private readonly IDatabaseService _databaseService;
+		private readonly IImportPreparerFactory _importPreparerFactory;
 
-		public DataImporterService(IDatabaseService databaseService)
+		public DataImporterService(IDatabaseService databaseService, IImportPreparerFactory importPreparerFactory)
 		{
 			Guard.AgainstNull(databaseService, nameof(databaseService));
 			_databaseService = databaseService;
+
+			Guard.AgainstNull(importPreparerFactory, nameof(importPreparerFactory));
+			_importPreparerFactory = importPreparerFactory;
 		}
 
-		public async Task ImportData(string filePath)
+		public async Task<int> ImportData(string filePath)
 		{
 			if (!File.Exists(filePath))
 			{
 				throw new FileNotFoundException($"Cound not find file '{filePath}'.");
 			}
 
-			var allLines = File.ReadAllLines(filePath);
-			var recordsToAdd = new List<DailyRecord>();
-
-			foreach (var line in allLines)
+			var importPreparer = _importPreparerFactory.GetImportPreparer(GetFileType(filePath));
+			if (importPreparer == null)
 			{
-				recordsToAdd.Add(ConvertToDailyRecord(line.Split(',')));
+				throw new InvalidOperationException($"Could not find an appropriate import preparer for '{filePath}'.");
 			}
 
-			await _databaseService.AddRecordsAsync(recordsToAdd);
+			var records = await importPreparer.GetRecords(filePath);
+			await _databaseService.UpsertRecords(records);
+
+			return records.Count();
 		}
 
-		private DailyRecord ConvertToDailyRecord(string[] rawData)
+		private FileType GetFileType(string filePath)
 		{
-			if (!DateTime.TryParse(rawData[0], out var date))
+			var extension = Path.GetExtension(filePath);
+			return extension switch
 			{
-				throw new InvalidOperationException($"Invalid data for parsing date: [{rawData[0]}].");
-			}
-
-			// Convert empty strings to zeroes
-			if (string.IsNullOrEmpty(rawData[1]))
-			{
-				rawData[1] = "0";
-			}
-
-			if (string.IsNullOrEmpty(rawData[2]))
-			{
-				rawData[2] = "0";
-			}
-
-			if (!double.TryParse(rawData[1], out double weight))
-			{
-				throw new InvalidOperationException($"Invalid data for parsing weight: [{rawData[1]}].");
-			}
-
-			return new DailyRecord
-			{
-				Date = date,
-				Weight = weight,
+				".csv" => FileType.Csv,
+				".dat" => FileType.Sqlite,
+				_ => FileType.Unknown,
 			};
 		}
 	}

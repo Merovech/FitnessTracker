@@ -4,6 +4,6 @@ namespace FitnessTracker.Services.Interfaces
 {
 	public interface IDataImporterService
 	{
-		Task ImportData(string filePath);
+		Task<int> ImportData(string filePath);
 	}
 }

@@ -13,7 +13,7 @@ namespace FitnessTracker.Services.Interfaces
 
 		Task UpsertRecord(DateTime date, double weight);
 
-		Task AddRecordsAsync(IEnumerable<DailyRecord> records);
+		Task UpsertRecords(IEnumerable<DailyRecord> records);
 
 		Task CreateDatabase();
 	}

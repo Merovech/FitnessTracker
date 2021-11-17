@@ -16,5 +16,7 @@ namespace FitnessTracker.Utilities
 		public AddEditDataViewModel AddEditDataViewModel => App.ServiceProvider.GetService<AddEditDataViewModel>();
 
 		public SettingsViewModel SettingsViewModel => App.ServiceProvider.GetService<SettingsViewModel>();
+
+		public ImportViewModel ImportViewModel => App.ServiceProvider.GetService<ImportViewModel>();
 	}
 }
