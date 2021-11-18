@@ -8,7 +8,7 @@ namespace FitnessTracker.Utilities
 		{
 			if (item == null)
 			{
-				throw new ArgumentNullException($"'{name}' cannot be null.");
+				throw new ArgumentNullException(name);
 			}
 		}
 	}
