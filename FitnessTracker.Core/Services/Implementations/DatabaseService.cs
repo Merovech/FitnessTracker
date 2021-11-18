@@ -39,6 +39,7 @@ namespace FitnessTracker.Core.Services.Implementations
 				var records = new List<DailyRecord>();
 				if (!reader.HasRows)
 				{
+					reader.Close();
 					return new List<DailyRecord>();
 				}
 
@@ -53,6 +54,8 @@ namespace FitnessTracker.Core.Services.Implementations
 
 					records.Add(record);
 				}
+
+				reader.Close();
 
 				_dataCalculatorService.FillCalculatedDataFields(records);
 				return records;
@@ -75,7 +78,9 @@ namespace FitnessTracker.Core.Services.Implementations
 				}
 
 				await reader.ReadAsync();
-				return new DailyRecord { Id = reader.GetInt32(0), Date = reader.GetDateTime(1), Weight = reader.GetDouble(2) };
+				var returnRecord = new DailyRecord { Id = reader.GetInt32(0), Date = reader.GetDateTime(1), Weight = reader.GetDouble(2) };
+				reader.Close();
+				return returnRecord;
 			}
 		}
 
@@ -105,10 +110,14 @@ namespace FitnessTracker.Core.Services.Implementations
 
 		public async Task UpsertRecords(IEnumerable<DailyRecord> records)
 		{
+			Guard.AgainstNull(records, nameof(records));
+			Guard.AgainstEmptyList(records, nameof(records));
+
 			using (var conn = new SqliteConnection(_configService.DatabaseConnectionString))
 			{
 				await conn.OpenAsync();
 				var transaction = conn.BeginTransaction();
+				
 				try
 				{
 					var command = new SqliteCommand(string.Empty, conn, transaction);

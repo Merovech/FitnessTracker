@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FitnessTracker.Utilities
 {
@@ -9,6 +11,14 @@ namespace FitnessTracker.Utilities
 			if (item == null)
 			{
 				throw new ArgumentNullException(name);
+			}
+		}
+
+		public static void AgainstEmptyList<T>(IEnumerable<T> list, string name)
+		{
+			if (!list.Any())
+			{
+				throw new InvalidOperationException($"'{name}' cannot be empty.");
 			}
 		}
 	}
