@@ -3,5 +3,7 @@
 	public interface IConfigurationService
 	{
 		public string DatabaseConnectionString { get; }
+
+		public string SettingsFilename { get; }
 	}
 }

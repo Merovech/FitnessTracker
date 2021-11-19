@@ -13,12 +13,14 @@ using Moq;
 
 namespace FitnessTracker.Core.Tests.Services
 {
+	// Note that we're not going to test that CreateDatabase() works, since it's used in InitializeTest() for everything
+	// except for the constructor tests.
 	[TestClass]
 	public class DatabaseServiceTests
 	{
-		protected DatabaseServiceTestsBuilder Builder
+		protected DatabaseServiceBuilder Builder
 		{
-			get; 
+			get;
 			set;
 		}
 
@@ -31,7 +33,7 @@ namespace FitnessTracker.Core.Tests.Services
 		[TestInitialize]
 		public virtual void InitializeTest()
 		{
-			Builder = new DatabaseServiceTestsBuilder();
+			Builder = new DatabaseServiceBuilder();
 			Service = Builder.Build();
 
 			// Recreate a fresh DB each time.
@@ -39,7 +41,7 @@ namespace FitnessTracker.Core.Tests.Services
 		}
 
 		[TestCleanup]
-		public virtual void CleanupTest()
+		public void CleanupTest()
 		{
 			// Delete the test database so it can be recreated fresh.
 			if (File.Exists("test_data.dat"))
@@ -54,57 +56,128 @@ namespace FitnessTracker.Core.Tests.Services
 		}
 
 		[TestClass]
-		public  class ConstructorTests : DatabaseServiceTests
+		public class ConstructorTests : DatabaseServiceTests
 		{
 			[TestInitialize]
 			public override void InitializeTest()
 			{
 				// Only need a builder here; these tests don't need a database
-				Builder = new DatabaseServiceTestsBuilder();
+				Builder = new DatabaseServiceBuilder();
 			}
 
 			[TestMethod]
 			public void Should_Initialize_Correctly_With_Valid_Arguments()
 			{
-				try
-				{
-					var service = Builder.Build();
-					Assert.IsNotNull(service);
-				}
-				catch (Exception)
-				{
-					Assert.Fail("Service failed to initialize with valid arguments.");
-				}
+				var service = Builder.Build();
+				Assert.IsNotNull(service);
 			}
 
 			[TestMethod]
+			[ExpectedException(typeof(ArgumentNullException))]
 			public void Should_Throw_ArgumentNullException_With_Null_Calculator_Service()
 			{
-				try
-				{
-					Builder.DataCalculatorService = null;
-					_ = Builder.Build();
-					Assert.Fail("Calculator service was null, but service constructor did not fail.");
-				}
-				catch (ArgumentNullException)
-				{
-					// Do nothing, test passed.
-				}
+				Builder.DataCalculatorService = null;
+				_ = Builder.Build();
 			}
 
 			[TestMethod]
+			[ExpectedException(typeof(ArgumentNullException))]
 			public void Should_Throw_ArgumentNullException_With_Null_Configuration_Service()
 			{
-				try
-				{
-					Builder.ConfigurationService = null;
-					_ = Builder.Build();
-					Assert.Fail("Configuration service was null, but service constructor did not fail.");
-				}
-				catch (ArgumentNullException)
-				{
-					// Do nothing, test passed.
-				}
+				Builder.ConfigurationService = null;
+				_ = Builder.Build();
+			}
+		}
+
+		[TestClass]
+		public class GetAllRecordsTests : DatabaseServiceTests
+		{
+			[TestMethod]
+			public async Task Should_Return_All_Records()
+			{
+				// Pretty redundant with the verification portion of the UpsertRecordsTests, but we still
+				// should have a unit test here in case we ever need to change stuff.
+				var records = Builder.GenerateRandomRecords(5);
+				await Service.UpsertRecords(records);
+				var result = await Service.GetAllRecords();
+
+				Assert.AreEqual(records.Count, result.Count(), "Retrieved incorrect number of records.");
+				Builder.VerifyRecordListsAreEqual(records, result.ToList());
+			}
+
+			[TestMethod]
+			public async Task Should_Return_Empty_List_For_No_Records()
+			{
+				var result = await Service.GetAllRecords();
+
+				Assert.IsNotNull(result, "Service returned null when there were no records in the database.");
+				Assert.AreEqual(0, result.Count(), "Service returned records when there should have been none.");
+			}
+
+			[TestMethod]
+			public async Task Should_Call_DataCalculatorService_If_Records_Are_Found()
+			{
+				var records = Builder.GenerateRandomRecords(5);
+				await Service.UpsertRecords(records);
+				_ = await Service.GetAllRecords();
+				Builder.VerifyDataCalculatorServiceWasCalled(1);
+			}
+
+			[TestMethod]
+			public async Task Should_Not_Call_DataCalculatorService_If_No_Records_Are_Found()
+			{
+				_ = await Service.GetAllRecords();
+				Builder.VerifyDataCalculatorServiceWasCalled(0);
+			}
+		}
+
+		[TestClass]
+		public class GetRecordByDateTests : DatabaseServiceTests
+		{
+			[TestMethod]
+			public async Task Should_Successfully_Get_Record()
+			{
+				var records = Builder.GenerateRandomRecords(10);
+				await Service.UpsertRecords(records);
+
+				var foundRecord = await Service.GetRecordByDate(records[2].Date);
+				Assert.IsNotNull(foundRecord);
+				Assert.AreEqual(records[2].Date, foundRecord.Date, $"Found incorrect record for date '{records[2].Date}");
+				Assert.AreEqual(records[2].Weight, foundRecord.Weight, $"Found incorrect record for date '{records[2].Date}");
+			}
+
+			[TestMethod]
+			public async Task Should_Return_Null_For_Nonexistent_Record()
+			{
+				var records = Builder.GenerateRandomRecords(10);
+				await Service.UpsertRecords(records);
+
+				var foundRecord = await Service.GetRecordByDate(records[0].Date.AddDays(-1));
+				Assert.IsNull(foundRecord, "Found record that should not exist.");
+			}
+
+			[TestMethod]
+			public async Task Should_Return_Null_When_Searching_On_Empty_Record_Table()
+			{
+				var foundRecord = await Service.GetRecordByDate(DateTime.Today);
+				Assert.IsNull(foundRecord, "Found record that should not exist.");
+			}
+		}
+
+		[TestClass]
+		public class UpsertRecordTests : DatabaseServiceTests
+		{
+			[TestMethod]
+			public async Task Should_Successfully_Insert_New_Record()
+			{
+				var records = Builder.GenerateRandomRecords(1).First();
+				await Service.UpsertRecord(records.Date, records.Weight);
+				var insertedRecords = (await Service.GetAllRecords()).ToList();
+				Assert.AreEqual(1, insertedRecords.Count);
+
+				var insertedRecord = insertedRecords.First();
+				Assert.AreEqual(records.Date, insertedRecord.Date, "Record was inserted with incorrect date.");
+				Assert.AreEqual(records.Weight, insertedRecord.Weight, "Record was inserted with incorrect weight.");
 			}
 		}
 
@@ -135,71 +208,24 @@ namespace FitnessTracker.Core.Tests.Services
 				var insertedRecords = (await Service.GetAllRecords()).ToList();
 				Builder.VerifyRecordListsAreEqual(records, insertedRecords);
 			}
+
+			[TestMethod]
+			[ExpectedException(typeof(ArgumentNullException))]
+			public async Task Should_Throw_On_Null_Records()
+			{
+				await Service.UpsertRecords(null);
+			}
+
+			[TestMethod]
+			[ExpectedException(typeof(InvalidOperationException))]
+			public async Task Should_Throw_On_Empty_Records()
+			{
+				await Service.UpsertRecords(new List<DailyRecord>());
+			}
+
 		}
 
-		[TestClass]
-		public class UpsertRecordTests : DatabaseServiceTests
-		{
-			[TestMethod]
-			public async Task Should_Successfully_Insert_New_Records()
-			{
-				var records = Builder.GenerateRandomRecords(1).First();
-				await Service.UpsertRecord(records.Date, records.Weight);
-				var insertedRecords = (await Service.GetAllRecords()).ToList();
-				Assert.AreEqual(1, insertedRecords.Count);
-
-				var insertedRecord = insertedRecords.First();
-				Assert.AreEqual(records.Date, insertedRecord.Date, "Record was inserted with incorrect date.");
-				Assert.AreEqual(records.Weight, insertedRecord.Weight, "Record was inserted with incorrect weight.");
-			}
-		}
-
-
-		[TestClass]
-		public class GetAllRecordsTests : DatabaseServiceTests
-		{
-			[TestMethod]
-			public async Task Should_Return_All_Records()
-			{
-				// Pretty redundant with the verification portion of the UpsertRecordsTests, but we still
-				// should have a unit test here in case we ever need to change stuff.
-				var records = Builder.GenerateRandomRecords(5);
-				await Service.UpsertRecords(records);
-				var result = await Service.GetAllRecords();
-				
-				Assert.AreEqual(records.Count, result.Count(), "Retrieved incorrect number of records.");
-				Builder.VerifyRecordListsAreEqual(records, result.ToList());
-			}
-
-			[TestMethod]
-			public async Task Should_Return_Empty_List_For_No_Records()
-			{
-				// Pretty redundant with the verification portion of the UpsertRecordsTests, but we still
-				// should have a unit test here in case we ever need to change stuff.
-				var result = await Service.GetAllRecords();
-
-				Assert.IsNotNull(result, "Service returned null when there were no records in the database.");
-				Assert.AreEqual(0, result.Count(), "Service returned records when there should have been none.");
-			}
-
-			[TestMethod]
-			public async Task Should_Call_DataCalculatorService_If_Records_Are_Found()
-			{
-				var records = Builder.GenerateRandomRecords(5);
-				await Service.UpsertRecords(records);
-				_ = await Service.GetAllRecords();
-				Builder.VerifyDataCalculatorServiceWasCalled(1);
-			}
-
-			[TestMethod]
-			public async Task Should_Not_Call_DataCalculatorService_If_No_Records_Are_Found()
-			{
-				_ = await Service.GetAllRecords();
-				Builder.VerifyDataCalculatorServiceWasCalled(0);
-			}
-		}
-
-		protected class DatabaseServiceTestsBuilder
+		public class DatabaseServiceBuilder
 		{
 			private Mock<IDataCalculatorService> _dataCalculatorServiceMock;
 
@@ -211,11 +237,11 @@ namespace FitnessTracker.Core.Tests.Services
 
 			public IDataCalculatorService DataCalculatorService
 			{
-				get; 
-				set; 
+				get;
+				set;
 			}
 
-			public DatabaseServiceTestsBuilder()
+			public DatabaseServiceBuilder()
 			{
 				SetupMocks();
 			}

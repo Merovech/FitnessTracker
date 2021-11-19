@@ -5,5 +5,7 @@ namespace FitnessTracker.Services.Implementations
 	public class ConfigurationService : IConfigurationService
 	{
 		public string DatabaseConnectionString => "Data Source=data.dat";
+
+		public string SettingsFilename => "settings.json";
 	}
 }
