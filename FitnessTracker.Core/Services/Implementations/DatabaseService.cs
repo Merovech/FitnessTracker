@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Interfaces;
@@ -57,7 +58,11 @@ namespace FitnessTracker.Core.Services.Implementations
 
 				reader.Close();
 
-				_dataCalculatorService.FillCalculatedDataFields(records);
+				if (records.Any())
+				{
+					_dataCalculatorService.FillCalculatedDataFields(records);
+				}
+				
 				return records;
 			}
 		}
