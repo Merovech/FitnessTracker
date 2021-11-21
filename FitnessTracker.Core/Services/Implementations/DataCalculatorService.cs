@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Interfaces;
+using FitnessTracker.Utilities;
 
 namespace FitnessTracker.Core.Services.Implementations
 {
@@ -12,18 +13,19 @@ namespace FitnessTracker.Core.Services.Implementations
 
 		public void FillCalculatedDataFields(IEnumerable<DailyRecord> data)
 		{
+			Guard.AgainstNull(data, nameof(data));
+			Guard.AgainstEmptyList(data, nameof(data));
+
 			var dataList = data.ToList();
 			FillMovingWeightAverage(dataList);
 		}
 
 		public SummaryStatistics CalculateSummaryStatistics(IEnumerable<DailyRecord> data)
 		{
-			var retVal = new SummaryStatistics();
-			if (data == null || !data.Any())
-			{
-				return null;
-			}
+			Guard.AgainstNull(data, nameof(data));
+			Guard.AgainstEmptyList(data, nameof(data));
 
+			var retVal = new SummaryStatistics();
 			var dataList = data.ToList();
 			var startingWeight = dataList.FirstOrDefault().Weight;
 			var lowestWeightRecord = new DailyRecord { Id = 0, Weight = 0, MovingWeightAverage = double.MaxValue };
