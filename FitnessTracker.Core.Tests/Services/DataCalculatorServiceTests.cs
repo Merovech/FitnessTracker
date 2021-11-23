@@ -147,6 +147,71 @@ namespace FitnessTracker.Core.Tests.Services
 				Assert.IsNotNull(records.Last().MovingWeightAverage, "Moving weight average was not filled on the fifth record.");
 				Assert.IsNull(result.WeightChangeSincePrevious, "Weight change since previous was not null when there was only one moving average value available.");
 			}
+
+			[TestMethod]
+			public void Lowest_Weight_Should_Be_Null_With_No_Moving_Average()
+			{
+				var records = TestDataGenerator.GenerateRandomRecords(4);
+				var result = Service.CalculateSummaryStatistics(records);
+				Assert.IsNull(result.LowestWeight, "Lowest weight was not null when there was no moving average at all.");
+				Assert.IsNull(result.LowestWeightDate, "Lowest weight date was not null when there was no moving average at all.");
+			}
+
+			[TestMethod]
+			public void Highest_Weight_Should_Be_Null_With_No_Moving_Average()
+			{
+				var records = TestDataGenerator.GenerateRandomRecords(4);
+				var result = Service.CalculateSummaryStatistics(records);
+				Assert.IsNull(result.HighestWeight, "Highest weight was not null when there was no moving average at all.");
+				Assert.IsNull(result.HighestWeightDate, "Highest weight date was not null when there was no moving average at all.");
+			}
+
+			[TestMethod]
+			public void Should_Calculate_Lowest_Weight_Correctly()
+			{
+				var records = TestDataGenerator.GenerateRandomRecords(100);
+				Service.FillCalculatedDataFields(records);
+				var lowest = records.Where(r => r.MovingWeightAverage != null).Min(r => r.MovingWeightAverage);
+				var lowestRecord = records.First(r => r.MovingWeightAverage == lowest);
+				var result = Service.CalculateSummaryStatistics(records);
+
+				Assert.AreEqual(lowestRecord.MovingWeightAverage, result.LowestWeight, "Lowest weight was calculated incorrectly.");
+				Assert.AreEqual(lowestRecord.Date, result.LowestWeightDate, "Lowest weight was calculated incorrectly.");
+			}
+
+			[TestMethod]
+			public void Should_Calculate_Highest_Weight_Correctly()
+			{
+				var records = TestDataGenerator.GenerateRandomRecords(100);
+				Service.FillCalculatedDataFields(records);
+				var highest = records.Max(r => r.MovingWeightAverage);
+				var highestRecord = records.First(r => r.MovingWeightAverage == highest);
+				var result = Service.CalculateSummaryStatistics(records);
+
+				Assert.AreEqual(highestRecord.MovingWeightAverage, result.HighestWeight, "Highest weight was calculated incorrectly.");
+				Assert.AreEqual(highestRecord.Date, result.HighestWeightDate, "Highest weight was calculated incorrectly.");
+			}
+
+			[TestMethod]
+			public void Total_Weight_Change_Should_Be_Null_For_List_With_One_Record()
+			{
+				var records = TestDataGenerator.GenerateRandomRecords(1);
+				var result = Service.CalculateSummaryStatistics(records);
+
+				Assert.IsNull(result.TotalWeightChange, "Total weight change was calculated for a one-record list when it should not be.");
+			}
+
+			[TestMethod]
+			public void Total_Weight_Change_Should_Be_Calculated_Correctly()
+			{
+				var records = TestDataGenerator.GenerateRandomRecords(100);
+				var result = Service.CalculateSummaryStatistics(records);
+				var expected = Math.Round(records.Last().Weight - records.First().Weight, 1);
+
+				Assert.AreEqual(expected, result.TotalWeightChange, "Total weight change was calculated incorrectly.");
+
+
+			}
 		}
 
 		protected class DataCalculatorServiceBuilder
