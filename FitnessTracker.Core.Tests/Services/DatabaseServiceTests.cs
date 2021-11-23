@@ -97,7 +97,7 @@ namespace FitnessTracker.Core.Tests.Services
 			{
 				// Pretty redundant with the verification portion of the UpsertRecordsTests, but we still
 				// should have a unit test here in case we ever need to change stuff.
-				var records = Builder.GenerateRandomRecords(5);
+				var records = TestDataGenerator.GenerateRandomRecords(5);
 				await Service.UpsertRecords(records);
 				var result = await Service.GetAllRecords();
 
@@ -117,7 +117,7 @@ namespace FitnessTracker.Core.Tests.Services
 			[TestMethod]
 			public async Task Should_Call_DataCalculatorService_If_Records_Are_Found()
 			{
-				var records = Builder.GenerateRandomRecords(5);
+				var records = TestDataGenerator.GenerateRandomRecords(5);
 				await Service.UpsertRecords(records);
 				_ = await Service.GetAllRecords();
 				Builder.VerifyDataCalculatorServiceWasCalled(1);
@@ -137,7 +137,7 @@ namespace FitnessTracker.Core.Tests.Services
 			[TestMethod]
 			public async Task Should_Successfully_Get_Record()
 			{
-				var records = Builder.GenerateRandomRecords(10);
+				var records = TestDataGenerator.GenerateRandomRecords(10);
 				await Service.UpsertRecords(records);
 
 				var foundRecord = await Service.GetRecordByDate(records[2].Date);
@@ -149,7 +149,7 @@ namespace FitnessTracker.Core.Tests.Services
 			[TestMethod]
 			public async Task Should_Return_Null_For_Nonexistent_Record()
 			{
-				var records = Builder.GenerateRandomRecords(10);
+				var records = TestDataGenerator.GenerateRandomRecords(10);
 				await Service.UpsertRecords(records);
 
 				var foundRecord = await Service.GetRecordByDate(records[0].Date.AddDays(-1));
@@ -170,7 +170,7 @@ namespace FitnessTracker.Core.Tests.Services
 			[TestMethod]
 			public async Task Should_Successfully_Insert_New_Record()
 			{
-				var records = Builder.GenerateRandomRecords(1).First();
+				var records = TestDataGenerator.GenerateRandomRecords(1).First();
 				await Service.UpsertRecord(records.Date, records.Weight);
 				var insertedRecords = (await Service.GetAllRecords()).ToList();
 				Assert.AreEqual(1, insertedRecords.Count);
@@ -187,7 +187,7 @@ namespace FitnessTracker.Core.Tests.Services
 			[TestMethod]
 			public async Task Should_Successfully_Insert_New_Records()
 			{
-				var records = Builder.GenerateRandomRecords(10);
+				var records = TestDataGenerator.GenerateRandomRecords(10);
 				await Service.UpsertRecords(records);
 				var insertedRecords = (await Service.GetAllRecords()).ToList();
 				Builder.VerifyRecordListsAreEqual(records, insertedRecords);
@@ -196,7 +196,7 @@ namespace FitnessTracker.Core.Tests.Services
 			[TestMethod]
 			public async Task Should_Successfully_Overwrite_Existing_Records()
 			{
-				var records = Builder.GenerateRandomRecords(10);
+				var records = TestDataGenerator.GenerateRandomRecords(10);
 				await Service.UpsertRecords(records);
 
 				records[0].Weight += 1;
@@ -249,20 +249,6 @@ namespace FitnessTracker.Core.Tests.Services
 			public IDatabaseService Build()
 			{
 				return new DatabaseService(DataCalculatorService, ConfigurationService);
-			}
-
-			public List<DailyRecord> GenerateRandomRecords(int count)
-			{
-				var startDate = new DateTime(2020, 1, 1);
-				var returnList = new List<DailyRecord>();
-				var rng = new Random();
-
-				for (int i = 0; i < count; i++)
-				{
-					returnList.Add(new DailyRecord { Date = startDate.AddDays(i), Weight = rng.NextDouble() * 200 });
-				}
-
-				return returnList;
 			}
 
 			public void VerifyRecordListsAreEqual(List<DailyRecord> expected, List<DailyRecord> actual)

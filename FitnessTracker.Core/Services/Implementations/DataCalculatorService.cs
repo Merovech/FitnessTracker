@@ -48,7 +48,7 @@ namespace FitnessTracker.Core.Services.Implementations
 				// Current weight is the latest Moving Average value.  If there is no moving average yet, get the last current weight.
 				if (i == dataList.Count - 1)
 				{
-					retVal.CurrentWeight = item.MovingWeightAverage;
+					retVal.CurrentWeight = item.MovingWeightAverage ?? item.Weight;
 					if (dataList.Count > 1)
 					{
 						// In the case where there is no moving average yet (<5 days of data), or this is the first moving average, don't fill this in.
