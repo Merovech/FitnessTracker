@@ -268,7 +268,6 @@ namespace FitnessTracker.Core.Tests.Services
 				ConfigurationService = configMock.Object;
 
 				_dataCalculatorServiceMock = new Mock<IDataCalculatorService>();
-				// TODO: Mock the actual methods
 				DataCalculatorService = _dataCalculatorServiceMock.Object;
 			}
 		}

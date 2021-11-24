@@ -11,6 +11,11 @@ namespace FitnessTracker.Core.ImportPreparer.Implementations
 	{
 		public Task<IEnumerable<DailyRecord>> GetRecords(string fileName)
 		{
+			if (!File.Exists(fileName))
+			{
+				throw new InvalidOperationException($"File '{fileName}' does not exist.");
+			}
+
 			var allLines = File.ReadAllLines(fileName);
 			var returnList = new List<DailyRecord>();
 
@@ -33,11 +38,6 @@ namespace FitnessTracker.Core.ImportPreparer.Implementations
 			if (string.IsNullOrEmpty(rawData[1]))
 			{
 				rawData[1] = "0";
-			}
-
-			if (string.IsNullOrEmpty(rawData[2]))
-			{
-				rawData[2] = "0";
 			}
 
 			if (!double.TryParse(rawData[1], out var weight))
