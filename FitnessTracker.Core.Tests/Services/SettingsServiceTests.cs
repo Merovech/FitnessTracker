@@ -8,44 +8,30 @@ using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Implementations;
 using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.Core.Tests.Helpers;
+using FitnessTracker.Core.Tests.Helpers.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
 namespace FitnessTracker.Core.Tests.Services
 {
 	[TestClass]
-	[TestCategory("SettingsService")]
-	public class SettingsServiceTests
+	public class SettingsServiceTests : TestBase<ISettingsService, SettingsServiceBuilder>
 	{
-		protected static string TEST_SETTINGS_FILENAME => "test-settings.json";
-
-		protected SettingsServiceBuilder Builder
-		{
-			get;
-			set;
-		}
-
-		protected ISettingsService Service
-		{
-			get;
-			set;
-		}
-
 		protected SettingsEqualityComparer Comparer { get; } = new();
 
 		[TestInitialize]
 		public virtual void InitializeTest()
 		{
 			Builder = new SettingsServiceBuilder();
-			Service = Builder.Build();
+			Target = Builder.Build();
 		}
 
 		[TestCleanup]
 		public void CleanupTest()
 		{
-			if (File.Exists(TEST_SETTINGS_FILENAME))
+			if (File.Exists(Constants.TEST_SETTINGS_FILENAME))
 			{
-				File.Delete(TEST_SETTINGS_FILENAME);
+				File.Delete(Constants.TEST_SETTINGS_FILENAME);
 			}
 		}
 
@@ -81,7 +67,7 @@ namespace FitnessTracker.Core.Tests.Services
 			public void Should_Get_Default_Settings_When_File_Does_Not_Exist()
 			{
 				var settings = new SystemSettings();
-				var readSettings = Service.ReadSettings();
+				var readSettings = Target.ReadSettings();
 
 				Assert.IsNotNull(readSettings);
 				Assert.IsTrue(Comparer.Equals(settings, readSettings), "Incorrect settings were read from disk when no file exists.");
@@ -90,8 +76,8 @@ namespace FitnessTracker.Core.Tests.Services
 			[TestMethod]
 			public void Reading_Settings_When_No_File_Exists_Should_Create_One()
 			{
-				_ = Service.ReadSettings();
-				Assert.IsTrue(File.Exists(TEST_SETTINGS_FILENAME), "No default settings file was created after trying to read from a nonexistent settings file.");
+				_ = Target.ReadSettings();
+				Assert.IsTrue(File.Exists(Constants.TEST_SETTINGS_FILENAME), "No default settings file was created after trying to read from a nonexistent settings file.");
 			}
 
 			[TestMethod]
@@ -107,8 +93,8 @@ namespace FitnessTracker.Core.Tests.Services
 					WeightUnit = WeightUnit.Pounds
 				};
 
-				Service.SaveSettings(settings);
-				var readSettings = Service.ReadSettings();
+				Target.SaveSettings(settings);
+				var readSettings = Target.ReadSettings();
 				Assert.IsTrue(Comparer.Equals(settings, readSettings), "Incorrect settings were read from disk.");
 			}
 
@@ -123,13 +109,13 @@ namespace FitnessTracker.Core.Tests.Services
 					WeightUnit = WeightUnit.Pounds
 				};
 
-				Service.SaveSettings(settings);
-				var readSettings = Service.ReadSettings();
+				Target.SaveSettings(settings);
+				var readSettings = Target.ReadSettings();
 				Assert.IsTrue(Comparer.Equals(settings, readSettings), "Incorrect settings were read from disk.");
 
 				settings.IsDarkTheme = false;
-				Service.SaveSettings(settings);
-				readSettings = Service.ReadSettings();
+				Target.SaveSettings(settings);
+				readSettings = Target.ReadSettings();
 				Assert.IsTrue(Comparer.Equals(settings, readSettings), "Incorrect settings were read from disk.");
 			}
 		}
@@ -141,11 +127,11 @@ namespace FitnessTracker.Core.Tests.Services
 			public void Should_Write_Successfully_When_No_File_Exists()
 			{
 				var settings = new SystemSettings();
-				Service.SaveSettings(settings);
+				Target.SaveSettings(settings);
 
 				// Test that something wrote.
-				Assert.IsTrue(File.Exists(TEST_SETTINGS_FILENAME), "File was not written successfully.");
-				var fileInfo = new FileInfo(TEST_SETTINGS_FILENAME);
+				Assert.IsTrue(File.Exists(Constants.TEST_SETTINGS_FILENAME), "File was not written successfully.");
+				var fileInfo = new FileInfo(Constants.TEST_SETTINGS_FILENAME);
 				Assert.AreNotEqual(0, fileInfo.Length, "No content was written to the file.");			
 			}
 
@@ -153,7 +139,7 @@ namespace FitnessTracker.Core.Tests.Services
 			[ExpectedException(typeof(ArgumentNullException))]
 			public void Should_Throw_On_Null_Settings()
 			{
-				Service.SaveSettings(null);
+				Target.SaveSettings(null);
 			}
 
 			[TestMethod]
@@ -167,9 +153,9 @@ namespace FitnessTracker.Core.Tests.Services
 					WeightGraphMaximum = 100
 				};
 
-				Service.SaveSettings(settings);
+				Target.SaveSettings(settings);
 
-				var writtenSettings = Service.ReadSettings();
+				var writtenSettings = Target.ReadSettings();
 				Assert.IsTrue(Comparer.Equals(writtenSettings, settings), "Incorrect settings were written to disk.");
 			}
 
@@ -184,12 +170,12 @@ namespace FitnessTracker.Core.Tests.Services
 					WeightGraphMaximum = 100
 				};
 
-				Service.SaveSettings(settings);
+				Target.SaveSettings(settings);
 				settings.IsDarkTheme = false;
 				settings.WeightUnit = WeightUnit.Pounds;
-				Service.SaveSettings(settings);
+				Target.SaveSettings(settings);
 
-				var writtenSettings = Service.ReadSettings();
+				var writtenSettings = Target.ReadSettings();
 				Assert.IsTrue(Comparer.Equals(writtenSettings, settings), "Settings were not overwritten on second write.");
 			}
 
@@ -203,35 +189,9 @@ namespace FitnessTracker.Core.Tests.Services
 					WeightGraphMaximum = 100
 				};
 
-				Service.SaveSettings(settings);
-				var contents = File.ReadAllText(TEST_SETTINGS_FILENAME);
+				Target.SaveSettings(settings);
+				var contents = File.ReadAllText(Constants.TEST_SETTINGS_FILENAME);
 				Assert.IsFalse(contents.Contains("weightGraphMinimum"), "Null value was written to the settings file.");
-			}
-		}
-
-		protected class SettingsServiceBuilder
-		{
-			public IConfigurationService ConfigurationService
-			{
-				get;
-				set;
-			}
-
-			public SettingsServiceBuilder()
-			{
-				CreateMocks();
-			}
-
-			public ISettingsService Build()
-			{
-				return new SettingsService(ConfigurationService);
-			}
-
-			private void CreateMocks()
-			{
-				var mock = new Mock<IConfigurationService>();
-				mock.Setup(svc => svc.SettingsFilename).Returns(TEST_SETTINGS_FILENAME);
-				ConfigurationService = mock.Object;
 			}
 		}
 	}

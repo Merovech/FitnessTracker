@@ -21,5 +21,13 @@ namespace FitnessTracker.Utilities
 				throw new InvalidOperationException($"'{name}' cannot be empty.");
 			}
 		}
+
+		public static void AgainstEmptyString(string item, string name)
+		{
+			if (item == string.Empty)
+			{
+				throw new InvalidOperationException($"'{name}' cannot be empty.");
+			}
+		}
 	}
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using FitnessTracker.Core.Models;
 using FitnessTracker.Core.ImportPreparer.Interfaces;
+using FitnessTracker.Utilities;
 
 namespace FitnessTracker.Core.ImportPreparer.Implementations
 {
@@ -11,9 +12,12 @@ namespace FitnessTracker.Core.ImportPreparer.Implementations
 	{
 		public Task<IEnumerable<DailyRecord>> GetRecords(string fileName)
 		{
+			Guard.AgainstNull(fileName, nameof(fileName));
+			Guard.AgainstEmptyList(fileName, nameof(fileName));
+
 			if (!File.Exists(fileName))
 			{
-				throw new InvalidOperationException($"File '{fileName}' does not exist.");
+				throw new FileNotFoundException($"File '{fileName}' does not exist.");
 			}
 
 			var allLines = File.ReadAllLines(fileName);

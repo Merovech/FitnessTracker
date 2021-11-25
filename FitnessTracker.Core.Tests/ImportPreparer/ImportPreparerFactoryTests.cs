@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FitnessTracker.Core.ImportPreparer.Implementations;
-using FitnessTracker.Core.ImportPreparer.Interfaces;
 using FitnessTracker.Core.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
