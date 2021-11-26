@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Interfaces;
+using FitnessTracker.Utilities;
 
 namespace FitnessTracker.Core.Services.Implementations
 {
@@ -12,18 +13,21 @@ namespace FitnessTracker.Core.Services.Implementations
 
 		public void FillCalculatedDataFields(IEnumerable<DailyRecord> data)
 		{
+			Guard.AgainstNull(data, nameof(data));
+			Guard.AgainstEmptyList(data, nameof(data));
+
 			var dataList = data.ToList();
 			FillMovingWeightAverage(dataList);
 		}
 
 		public SummaryStatistics CalculateSummaryStatistics(IEnumerable<DailyRecord> data)
 		{
-			var retVal = new SummaryStatistics();
 			if (data == null || !data.Any())
 			{
 				return null;
 			}
 
+			var retVal = new SummaryStatistics();
 			var dataList = data.ToList();
 			var startingWeight = dataList.FirstOrDefault().Weight;
 			var lowestWeightRecord = new DailyRecord { Id = 0, Weight = 0, MovingWeightAverage = double.MaxValue };
@@ -46,7 +50,7 @@ namespace FitnessTracker.Core.Services.Implementations
 				// Current weight is the latest Moving Average value.  If there is no moving average yet, get the last current weight.
 				if (i == dataList.Count - 1)
 				{
-					retVal.CurrentWeight = item.MovingWeightAverage;
+					retVal.CurrentWeight = item.MovingWeightAverage ?? item.Weight;
 					if (dataList.Count > 1)
 					{
 						// In the case where there is no moving average yet (<5 days of data), or this is the first moving average, don't fill this in.

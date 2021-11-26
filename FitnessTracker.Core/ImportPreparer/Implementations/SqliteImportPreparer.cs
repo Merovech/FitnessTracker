@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using FitnessTracker.Core.Models;
 using FitnessTracker.Core.ImportPreparer.Interfaces;
 using Microsoft.Data.Sqlite;
+using FitnessTracker.Utilities;
+using System.IO;
 
 namespace FitnessTracker.Core.ImportPreparer.Implementations
 {
@@ -11,6 +13,14 @@ namespace FitnessTracker.Core.ImportPreparer.Implementations
 	{
 		public async Task<IEnumerable<DailyRecord>> GetRecords(string fileName)
 		{
+			Guard.AgainstNull(fileName, nameof(fileName));
+			Guard.AgainstEmptyString(fileName, nameof(fileName));
+
+			if (!File.Exists(fileName))
+			{
+				throw new FileNotFoundException($"File '{fileName}' does not exist.");
+			}
+
 			var connectionString = $"Data Source={fileName};";
 
 			using (var conn = new SqliteConnection(connectionString))

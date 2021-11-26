@@ -13,7 +13,7 @@ namespace FitnessTracker.Core.ImportPreparer.Implementations
 				FileType.Csv => new CsvImportPreparer(),
 				FileType.Sqlite => new SqliteImportPreparer(),
 				FileType.Unknown => throw new InvalidOperationException($"Unable to find an import preparer for file of type '{fileType}'."),
-				_ => null,
+				_ => throw new InvalidOperationException($"Unable to find an import preparer for file of type '{fileType}'.")
 			};
 		}
 	}
