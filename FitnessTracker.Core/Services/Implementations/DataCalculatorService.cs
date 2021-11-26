@@ -22,8 +22,10 @@ namespace FitnessTracker.Core.Services.Implementations
 
 		public SummaryStatistics CalculateSummaryStatistics(IEnumerable<DailyRecord> data)
 		{
-			Guard.AgainstNull(data, nameof(data));
-			Guard.AgainstEmptyList(data, nameof(data));
+			if (data == null || !data.Any())
+			{
+				return null;
+			}
 
 			var retVal = new SummaryStatistics();
 			var dataList = data.ToList();

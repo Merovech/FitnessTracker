@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using FitnessTracker.Core.ImportPreparer.Interfaces;
 using FitnessTracker.Core.Services.Implementations;
@@ -58,6 +59,16 @@ namespace FitnessTracker.Core.Tests.ImportPreparer
 		public class GetRecordsTests : SqliteImportPreparerTests
 		{
 			[TestMethod]
+			public async Task Should_Prepare_Records_Successfully()
+			{
+				var records = TestDataGenerator.GenerateRandomRecords(100);
+				await DatabaseService.UpsertRecords(records);
+				var results = (await Target.GetRecords(Constants.IMPORT_DATABASE_FILENAME)).ToList();
+
+				Assert.IsTrue(results.SequenceEqual(records, new DailyRecordEqualityComparer()), "Records were not prepared accurately.");
+			}
+
+			[TestMethod]
 			[ExpectedException(typeof(ArgumentNullException))]
 			public async Task Should_Fail_With_Null_FileName()
 			{
@@ -76,6 +87,30 @@ namespace FitnessTracker.Core.Tests.ImportPreparer
 			public async Task Should_Fail_With_Nonexistent_File()
 			{
 				_ = await Target.GetRecords("file-does-not-exist.dat");
+			}
+
+			[TestMethod]
+			[ExpectedException(typeof(InvalidOperationException))]
+			public async Task Should_Fail_With_No_Records_Table()
+			{
+				await Builder.CreateInvalidDatabaseTables();
+				_ = await Target.GetRecords(Constants.IMPORT_DATABASE_FILENAME);
+			}
+
+			[TestMethod]
+			[ExpectedException(typeof(InvalidOperationException))]
+			public async Task Should_Fail_With_Invalid_Structure()
+			{
+				await Builder.CreateInvalidDatabaseColumns();
+				_ = await Target.GetRecords(Constants.IMPORT_DATABASE_FILENAME);
+			}
+
+			[TestMethod]
+			[ExpectedException(typeof(InvalidOperationException))]
+			public async Task Should_Fail_With_Invalid_Data_Types()
+			{
+				await Builder.CreateInvalidDatabaseDataTypesWithData();
+				_ = await Target.GetRecords(Constants.IMPORT_DATABASE_FILENAME);
 			}
 		}
 	}

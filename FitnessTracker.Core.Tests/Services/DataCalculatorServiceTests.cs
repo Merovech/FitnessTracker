@@ -98,17 +98,17 @@ namespace FitnessTracker.Core.Tests.Services
 		public class CalculateCummsaryStatisticsTests : DataCalculatorServiceTests
 		{
 			[TestMethod]
-			[ExpectedException(typeof(ArgumentNullException))]
-			public void Should_Fail_On_Null_List()
+			public void Should_Return_Null_On_Null_List()
 			{
-				_ = Target.CalculateSummaryStatistics(null);
+				var result = Target.CalculateSummaryStatistics(null);
+				Assert.IsNull(result, "Null list yielded non-null summary statistics.");
 			}
 
 			[TestMethod]
-			[ExpectedException(typeof(InvalidOperationException))]
-			public void Should_Fail_On_Empty_List()
+			public void Should_Return_Null_On_Empty_List()
 			{
-				_ = Target.CalculateSummaryStatistics(new List<DailyRecord>());
+				var result = Target.CalculateSummaryStatistics(new List<DailyRecord>());
+				Assert.IsNull(result, "Null list yielded non-null summary statistics.");
 			}
 
 			[TestMethod]
