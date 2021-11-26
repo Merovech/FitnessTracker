@@ -13,5 +13,7 @@ namespace FitnessTracker.Core.Tests.Helpers
 		public static string TEST_DATABASE_FILENAME => "test-data.dat";
 
 		public static string IMPORT_DATABASE_FILENAME => "sql-import-test-data.dat";
+
+		public static string IMPORT_CSV_FILENAME => "csv-import-test-data.csv";
 	}
 }

@@ -69,6 +69,13 @@ namespace FitnessTracker.Core.Tests.ImportPreparer
 			}
 
 			[TestMethod]
+			public async Task Should_Return_Empty_List_With_No_Rows_Found()
+			{
+				var results = await Target.GetRecords(Constants.IMPORT_DATABASE_FILENAME);
+				Assert.AreEqual(0, results.Count(), "Non-empty list returned when no records were found.");
+			}
+
+			[TestMethod]
 			[ExpectedException(typeof(ArgumentNullException))]
 			public async Task Should_Fail_With_Null_FileName()
 			{
