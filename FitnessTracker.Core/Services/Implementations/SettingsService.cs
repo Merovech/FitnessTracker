@@ -17,7 +17,7 @@ namespace FitnessTracker.Core.Services.Implementations
 		public SettingsService(IConfigurationService configurationService)
 		{
 			Guard.AgainstNull(configurationService, nameof(configurationService));
-			_filename = configurationService.SettingsFilename;
+			_filename = configurationService.SettingsFileName;
 
 			_serializationOptions = new JsonSerializerOptions
 			{

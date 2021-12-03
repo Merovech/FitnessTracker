@@ -7,6 +7,7 @@ using FitnessTracker.Core.Services.Implementations;
 using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.Core.Tests.Helpers;
 using FitnessTracker.Core.Tests.Helpers.Builders;
+using FitnessTracker.Services.Implementations;
 using Microsoft.Data.Sqlite;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -23,11 +24,10 @@ namespace FitnessTracker.Core.Tests.ImportPreparer
 
 		public SqliteImportPreparerTests()
 		{
-			var configMock = new Mock<IConfigurationService>();
-			configMock.Setup(c => c.DatabaseConnectionString).Returns($"Data Source={Constants.IMPORT_DATABASE_FILENAME}");
+			var configMock = new Mock<ConfigurationService>() { CallBase = true };
+			configMock.Setup(c => c.DataFileName).Returns(Constants.IMPORT_DATABASE_FILENAME);
 
 			DatabaseService = new DatabaseService(new DataCalculatorService(), configMock.Object);
-
 		}
 
 		[TestInitialize]

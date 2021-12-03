@@ -2,8 +2,10 @@
 {
 	public interface IConfigurationService
 	{
+		public string DataFileName { get; }
+
 		public string DatabaseConnectionString { get; }
 
-		public string SettingsFilename { get; }
+		public string SettingsFileName { get; }
 	}
 }

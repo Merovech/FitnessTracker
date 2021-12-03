@@ -4,8 +4,11 @@ namespace FitnessTracker.Services.Implementations
 {
 	public class ConfigurationService : IConfigurationService
 	{
-		public string DatabaseConnectionString => "Data Source=data.dat";
+		// Virtual so test classes can override it.
+		public virtual string DataFileName => "FitnessData.ft";
 
-		public string SettingsFilename => "settings.json";
+		public string DatabaseConnectionString => $"Data Source={DataFileName}";
+
+		public string SettingsFileName => "settings.json";
 	}
 }

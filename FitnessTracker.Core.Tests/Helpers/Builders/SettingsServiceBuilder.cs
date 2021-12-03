@@ -25,7 +25,7 @@ namespace FitnessTracker.Core.Tests.Helpers.Builders
 		private void CreateMocks()
 		{
 			var mock = new Mock<IConfigurationService>();
-			mock.Setup(svc => svc.SettingsFilename).Returns(Constants.TEST_SETTINGS_FILENAME);
+			mock.Setup(svc => svc.SettingsFileName).Returns(Constants.TEST_SETTINGS_FILENAME);
 			ConfigurationService = mock.Object;
 		}
 	}

@@ -48,7 +48,7 @@ namespace FitnessTracker.Core.Services.Implementations
 			return extension switch
 			{
 				".csv" => FileType.Csv,
-				".dat" => FileType.Sqlite,
+				".dat" or ".ft" => FileType.Sqlite,
 				_ => FileType.Unknown,
 			};
 		}
