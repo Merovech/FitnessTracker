@@ -12,7 +12,7 @@ namespace FitnessTracker.UI.ViewModels
 {
 	public class ImportViewModel : ViewModelBase
 	{
-		private const string IMPORT_FILE_FILTER = "Comma-Separated Files|*.csv|FitnessTracker Files|*.dat";
+		private const string IMPORT_FILE_FILTER = "Comma-Separated Files|*.csv|FitnessTracker Data Files|*.ft|FitnessTracker Legacy Data Files|*.dat";
 
 		private readonly IDataImporterService _dataImporterService;
 		private readonly IFileDialogService _fileDialogService;
@@ -111,7 +111,8 @@ namespace FitnessTracker.UI.ViewModels
 			return Path.GetExtension(FileName) switch
 			{
 				".csv" => "Comma-Separated Value",
-				".dat" => "FitnessTracker Data",
+				".dat" => "FitnessTracker Legacy Data",
+				".ft" => "FitnessTracker Data",
 				_ => "Unknown",
 			};
 		}

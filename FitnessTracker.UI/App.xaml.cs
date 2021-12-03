@@ -93,7 +93,9 @@ namespace FitnessTracker.UI
 
 		private async Task VerifyOrCreateDatabase()
 		{
-			if (!File.Exists("data.dat"))
+			var configService = ServiceProvider.GetService<IConfigurationService>();
+
+			if (!File.Exists(configService.DataFileName))
 			{
 				var dbService = ServiceProvider.GetService<IDatabaseService>();
 				await dbService.CreateDatabase();

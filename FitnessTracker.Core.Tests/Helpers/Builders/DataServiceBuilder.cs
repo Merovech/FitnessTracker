@@ -4,6 +4,7 @@ using System.Linq;
 using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Implementations;
 using FitnessTracker.Core.Services.Interfaces;
+using FitnessTracker.Services.Implementations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
@@ -47,8 +48,8 @@ namespace FitnessTracker.Core.Tests.Helpers.Builders
 
 		private void SetupMocks()
 		{
-			var configMock = new Mock<IConfigurationService>();
-			configMock.Setup(svc => svc.DatabaseConnectionString).Returns($"Data Source={Constants.TEST_DATABASE_FILENAME}");
+			var configMock = new Mock<ConfigurationService>() { CallBase = true };
+			configMock.Setup(svc => svc.DataFileName).Returns(Constants.TEST_DATABASE_FILENAME);
 			ConfigurationService = configMock.Object;
 
 			_dataCalculatorServiceMock = new Mock<IDataCalculatorService>();
