@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FitnessTracker.Core.Models;
-using FitnessTracker.Core.Services.Implementations;
 using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.Core.Tests.Helpers;
 using FitnessTracker.Core.Tests.Helpers.Builders;
@@ -17,7 +16,7 @@ namespace FitnessTracker.Core.Tests.Services
 		public void InitializeTest()
 		{
 			Builder = new DataCalculatorServiceBuilder();
-			Target = new DataCalculatorService();
+			Target = Builder.Build();
 		}
 
 		[TestClass]

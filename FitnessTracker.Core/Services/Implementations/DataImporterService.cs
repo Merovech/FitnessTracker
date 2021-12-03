@@ -25,6 +25,9 @@ namespace FitnessTracker.Core.Services.Implementations
 
 		public async Task<int> ImportData(string filePath)
 		{
+			Guard.AgainstNull(filePath, nameof(filePath));
+			Guard.AgainstEmptyString(filePath, nameof(filePath));
+
 			if (!File.Exists(filePath))
 			{
 				throw new FileNotFoundException($"Cound not find file '{filePath}'.");
