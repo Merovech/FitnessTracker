@@ -1,9 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using FitnessTracker.Core.Models;
+using CsvHelper;
+using CsvHelper.Configuration;
 using FitnessTracker.Core.ImportPreparer.Interfaces;
+using FitnessTracker.Core.Models;
+using FitnessTracker.Core.Utilities;
 using FitnessTracker.Utilities;
 
 namespace FitnessTracker.Core.ImportPreparer.Implementations
@@ -20,40 +25,21 @@ namespace FitnessTracker.Core.ImportPreparer.Implementations
 				throw new FileNotFoundException($"File '{fileName}' does not exist.");
 			}
 
-			var allLines = File.ReadAllLines(fileName);
-			var returnList = new List<DailyRecord>();
-
-			foreach (var line in allLines)
+			var config = new CsvConfiguration(CultureInfo.CurrentCulture)
 			{
-				returnList.Add(ConvertToDailyRecord(line.Split(',')));
-			}
-
-			return Task.FromResult((IEnumerable<DailyRecord>)returnList);
-		}
-
-		private DailyRecord ConvertToDailyRecord(string[] rawData)
-		{
-			if (!DateTime.TryParse(rawData[0], out var date))
-			{
-				throw new InvalidOperationException($"Invalid data for parsing date: [{rawData[0]}].");
-			}
-
-			// Convert empty strings to zeroes
-			if (string.IsNullOrEmpty(rawData[1]))
-			{
-				rawData[1] = "0";
-			}
-
-			if (!double.TryParse(rawData[1], out var weight))
-			{
-				throw new InvalidOperationException($"Invalid data for parsing weight: [{rawData[1]}].");
-			}
-
-			return new DailyRecord
-			{
-				Date = date,
-				Weight = weight,
+				HasHeaderRecord = false
 			};
+
+			using (var streamReader = new StreamReader(fileName))
+			{
+				using (var csvReader = new CsvReader(streamReader, config))
+				{
+					csvReader.Context.RegisterClassMap<DailyRecordCsvMap>();
+					
+					var records = csvReader.GetRecords<DailyRecord>();
+					return Task.FromResult((IEnumerable<DailyRecord>)records.ToList());
+				}
+			}
 		}
 	}
 }
