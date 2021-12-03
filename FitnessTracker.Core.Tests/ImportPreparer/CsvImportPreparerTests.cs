@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CsvHelper;
 using FitnessTracker.Core.ImportPreparer.Interfaces;
 using FitnessTracker.Core.Tests.Helpers;
 using FitnessTracker.Core.Tests.Helpers.Builders;
@@ -39,14 +40,13 @@ namespace FitnessTracker.Core.Tests.ImportPreparer
 				Assert.AreEqual(0, result.Count(), "Non-empty list returned from empty file.");
 			}
 
-
 			[TestMethod]
 			public async Task Should_Read_Records_Correctly()
 			{
 				var records = TestDataGenerator.GenerateRandomRecords(100);
 				Builder.CreateValidData(records);
 				var result = await Target.GetRecords(Constants.IMPORT_CSV_FILENAME);
-				Assert.IsTrue(result.SequenceEqual(records, new DailyRecordEqualityComparer()), "Non-empty list returned from empty file.");
+				Assert.IsTrue(result.SequenceEqual(records, new DailyRecordEqualityComparer()), "Records were not read correctly.");
 			}
 
 			[TestMethod]
@@ -72,7 +72,7 @@ namespace FitnessTracker.Core.Tests.ImportPreparer
 
 			// Switching to a CSV library should render these next two obsolete.
 			[TestMethod]
-			[ExpectedException(typeof(InvalidOperationException))]
+			[ExpectedException(typeof(ReaderException))]
 			public async Task Should_Fail_On_Invalid_Data()
 			{
 				Builder.CreateInvalidData();
@@ -80,7 +80,7 @@ namespace FitnessTracker.Core.Tests.ImportPreparer
 			}
 
 			[TestMethod]
-			[ExpectedException(typeof(InvalidOperationException))]
+			[ExpectedException(typeof(ReaderException))]
 			public async Task Should_Fail_On_Invalid_Data_Content()
 			{
 				Builder.CreateUnparseableData();
