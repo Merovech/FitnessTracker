@@ -8,9 +8,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using FitnessTracker.Core.ImportPreparer.Implementations;
 using FitnessTracker.Core.ImportPreparer.Interfaces;
+using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.UI.Views;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FitnessTracker.UI
 {
@@ -22,11 +25,26 @@ namespace FitnessTracker.UI
 			"FitnessTracker.Core"
 		};
 
-		public static ServiceProvider ServiceProvider { get; private set; }
+		public static ServiceProvider ServiceProvider
+		{
+			get; private set;
+		}
+
+		public IConfiguration Configuration
+		{
+			get; private set;
+		}
 
 		public App()
 		{
 			var serviceCollection = new ServiceCollection();
+			var configBuilder = new ConfigurationBuilder()
+				.SetBasePath(Directory.GetCurrentDirectory())
+				.AddJsonFile("appsettings.json", false, true);
+
+			Configuration = configBuilder.Build();
+			serviceCollection.Configure<ApplicationSettings>(Configuration.GetSection("settings"));
+
 			RegisterInjectables(serviceCollection);
 			ServiceProvider = serviceCollection.BuildServiceProvider();
 			Task.Run(async () => await VerifyOrCreateDatabase()).Wait();
@@ -93,9 +111,9 @@ namespace FitnessTracker.UI
 
 		private async Task VerifyOrCreateDatabase()
 		{
-			var configService = ServiceProvider.GetService<IConfigurationService>();
+			var config = ServiceProvider.GetService<IOptions<ApplicationSettings>>();
 
-			if (!File.Exists(configService.DataFileName))
+			if (!File.Exists(config.Value.DataFileName))
 			{
 				var dbService = ServiceProvider.GetService<IDatabaseService>();
 				await dbService.CreateDatabase();
