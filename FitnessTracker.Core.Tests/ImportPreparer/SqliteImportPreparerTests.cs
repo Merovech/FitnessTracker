@@ -25,7 +25,7 @@ namespace FitnessTracker.Core.Tests.ImportPreparer
 		public SqliteImportPreparerTests()
 		{
 			var configMock = new Mock<ConfigurationService>() { CallBase = true };
-			configMock.Setup(c => c.DataFileName).Returns(Constants.IMPORT_DATABASE_FILENAME);
+			configMock.Setup(c => c.DatabaseConnectionString).Returns($"Data Source={Constants.IMPORT_DATABASE_FILENAME}");
 
 			DatabaseService = new DatabaseService(new DataCalculatorService(), configMock.Object);
 		}

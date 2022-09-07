@@ -49,7 +49,7 @@ namespace FitnessTracker.Core.Tests.Helpers.Builders
 		private void SetupMocks()
 		{
 			var configMock = new Mock<ConfigurationService>() { CallBase = true };
-			configMock.Setup(svc => svc.DataFileName).Returns(Constants.TEST_DATABASE_FILENAME);
+			configMock.Setup(svc => svc.DatabaseConnectionString).Returns($"Data Source={Constants.TEST_DATABASE_FILENAME}");
 			ConfigurationService = configMock.Object;
 
 			_dataCalculatorServiceMock = new Mock<IDataCalculatorService>();

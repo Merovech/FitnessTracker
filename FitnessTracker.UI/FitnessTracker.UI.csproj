@@ -11,7 +11,9 @@
     <PackageReference Include="LiveCharts.Wpf.NetCore3" Version="0.9.7" />
     <PackageReference Include="MaterialDesignColors" Version="2.0.3" />
     <PackageReference Include="MaterialDesignThemes" Version="4.2.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
     <PackageReference Include="MvvmLightLibsStd10" Version="5.4.1.1" />
   </ItemGroup>
 
@@ -38,6 +40,12 @@
     <Compile Update="Views\SummaryView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
