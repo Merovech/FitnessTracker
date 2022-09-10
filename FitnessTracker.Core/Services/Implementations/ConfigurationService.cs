@@ -1,9 +1,11 @@
-﻿using FitnessTracker.Core.Models;
+﻿using FitnessTracker.Core;
+using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace FitnessTracker.Services.Implementations
 {
+	[DependencyInjectionType(DependencyInjectionType.Service)]
 	public class ConfigurationService : IConfigurationService
 	{
 		private readonly ApplicationSettings _settings;

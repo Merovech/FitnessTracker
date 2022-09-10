@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using FitnessTracker.Core;
 using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.UI.Messages;
 using FitnessTracker.UI.Services.Interfaces;
@@ -10,6 +11,7 @@ using MaterialDesignThemes.Wpf;
 
 namespace FitnessTracker.UI.ViewModels
 {
+	[DependencyInjectionType(DependencyInjectionType.Other)]
 	public class ImportViewModel : ViewModelBase
 	{
 		private const string IMPORT_FILE_FILTER = "Comma-Separated Files|*.csv|FitnessTracker Data Files|*.ft|FitnessTracker Legacy Data Files|*.dat";

@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Core.Services.Interfaces;
+﻿using FitnessTracker.Core;
+using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.UI.Messages;
 using FitnessTracker.Utilities;
 using GalaSoft.MvvmLight;
@@ -6,6 +7,7 @@ using MaterialDesignThemes.Wpf;
 
 namespace FitnessTracker.UI.ViewModels
 {
+	[DependencyInjectionType(DependencyInjectionType.Other)]
 	public class MainViewModel : ViewModelBase
 	{
 		private readonly ISettingsService _settingsService;

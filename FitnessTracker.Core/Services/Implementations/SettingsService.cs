@@ -8,6 +8,7 @@ using FitnessTracker.Utilities;
 
 namespace FitnessTracker.Core.Services.Implementations
 {
+	[DependencyInjectionType(DependencyInjectionType.Service)]
 	public class SettingsService : ISettingsService
 	{
 		private readonly string _filename;

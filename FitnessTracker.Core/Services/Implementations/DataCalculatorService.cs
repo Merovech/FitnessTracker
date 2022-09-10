@@ -7,6 +7,7 @@ using FitnessTracker.Utilities;
 
 namespace FitnessTracker.Core.Services.Implementations
 {
+	[DependencyInjectionType(DependencyInjectionType.Service)]
 	public class DataCalculatorService : IDataCalculatorService
 	{
 		private const int _averageWindowInDays = 5;

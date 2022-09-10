@@ -9,6 +9,7 @@ using FitnessTracker.Utilities;
 
 namespace FitnessTracker.Core.Services.Implementations
 {
+	[DependencyInjectionType(DependencyInjectionType.Service)]
 	public class DataImporterService : IDataImporterService
 	{
 		private readonly IDatabaseService _databaseService;

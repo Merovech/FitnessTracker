@@ -10,6 +10,7 @@ using Microsoft.Data.Sqlite;
 
 namespace FitnessTracker.Core.Services.Implementations
 {
+	[DependencyInjectionType(DependencyInjectionType.Service)]
 	public class DatabaseService : IDatabaseService
 	{
 		private const string GET_ALL_QUERY = "SELECT * FROM Records";

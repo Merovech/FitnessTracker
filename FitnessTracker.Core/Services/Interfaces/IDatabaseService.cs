@@ -5,6 +5,7 @@ using FitnessTracker.Core.Models;
 
 namespace FitnessTracker.Core.Services.Interfaces
 {
+	[DependencyInjectionType(DependencyInjectionType.Interface)]
 	public interface IDatabaseService
 	{
 		Task<DailyRecord> GetRecordByDate(DateTime recordDate);

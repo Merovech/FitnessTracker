@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
+using FitnessTracker.Core;
 using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.UI.Messages;
@@ -13,6 +14,7 @@ using LiveCharts.Wpf;
 
 namespace FitnessTracker.UI.ViewModels
 {
+	[DependencyInjectionType(DependencyInjectionType.Other)]
 	public class WeightChartViewModel : ViewModelBase
 	{
 		private readonly ISettingsService _settingsService;

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using FitnessTracker.Core;
 using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.UI.Messages;
@@ -8,6 +9,7 @@ using GalaSoft.MvvmLight;
 
 namespace FitnessTracker.UI.ViewModels
 {
+	[DependencyInjectionType(DependencyInjectionType.Other)]
 	public class SummaryViewModel : ViewModelBase
 	{
 		private readonly IDataCalculatorService _dataCalculatorService;

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-using FitnessTracker.Core.ImportPreparer.Implementations;
-using FitnessTracker.Core.ImportPreparer.Interfaces;
+using FitnessTracker.Core;
 using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.UI.Views;
@@ -22,7 +20,9 @@ namespace FitnessTracker.UI
 {
 	public partial class App : Application
 	{
-		private readonly string[] loadableAssemblyNames = new[]
+		private readonly Logger _logger;
+
+		private readonly string[] _loadableAssemblyNames = new[]
 		{
 			"FitnessTracker.UI",
 			"FitnessTracker.Core"
@@ -64,11 +64,11 @@ namespace FitnessTracker.UI
 
 			SetNLogLevel(logLevel);
 
-			var logger = LogManager.GetCurrentClassLogger();
-			logger.Debug("Application startup");
-			RegisterInjectables(serviceCollection, logger);
+			_logger = LogManager.GetCurrentClassLogger();
+			_logger.Debug("Application startup");
+			RegisterInjectables(serviceCollection);
 			ServiceProvider = serviceCollection.BuildServiceProvider();
-			Task.Run(async () => await VerifyOrCreateDatabase(logger)).Wait();
+			Task.Run(async () => await VerifyOrCreateDatabase()).Wait();
 		}
 
 		private void OnStartup(object sender, StartupEventArgs e)
@@ -79,8 +79,7 @@ namespace FitnessTracker.UI
 
 		private void OnExit(object sender, ExitEventArgs e)
 		{
-			var logger = LogManager.GetCurrentClassLogger();
-			logger.Debug("Application exit");
+			_logger.Debug("Application exit");
 		}
 
 		private void SetNLogLevel(NLog.LogLevel level)
@@ -99,83 +98,110 @@ namespace FitnessTracker.UI
 			LogManager.ReconfigExistingLoggers();
 		}
 
-		private void RegisterInjectables(IServiceCollection serviceCollection, Logger logger)
+		private void RegisterInjectables(IServiceCollection serviceCollection)
 		{
-			var types = Assembly.GetExecutingAssembly().ExportedTypes.ToList();
-			types.AddRange(GetAllReferencedAssemblyTypes());
-			logger.Trace("DI Registration: Found {count} potential injectables.", types.Count);
+			var injectables = Assembly.GetExecutingAssembly().ExportedTypes.ToList();
+			injectables.AddRange(GetAllReferencedAssemblyTypes());
+			_logger.Trace("DI Registration: Found {count} potential injectables.", injectables.Count);
 
-			var serviceInterfaces = new List<Type>();
-			var serviceImplementations = new List<Type>();
+			List<Type> interfaceList = new();
+			List<Type> implementationList = new();
+			List<Type> singletonList = new();
+			List<Type> otherList = new();
 
-			// MainViewModel is a special case, as it's the entry point for the app
-			logger.Debug("DI Registration: MainViewModel (singleton)");
-			var mainViewModel = types.FirstOrDefault(t => t.Name == nameof(MainWindowView));
-			serviceCollection.AddSingleton(mainViewModel);
-
-			// One-offs - not really a service, so looping through services and view models would catch these
-			serviceCollection.AddTransient<IImportPreparerFactory, ImportPreparerFactory>();
-
-			// ViewModels and Services
-			foreach (var t in types)
+			foreach (var inj in injectables)
 			{
-				if (t.Name.EndsWith("ViewModel", StringComparison.OrdinalIgnoreCase))
-				{
-					logger.Debug("DI Registration: Registering view model {vm}", t.Name);
-					serviceCollection.AddTransient(t);
-				}
-				else if (t.IsInterface && t.Name.EndsWith("Service", StringComparison.OrdinalIgnoreCase))
-				{
-					logger.Trace("DI Registration: Found {svci} (service interface)", t.Name);
-					serviceInterfaces.Add(t);
-				}
-				else if (!t.IsInterface && t.Name.EndsWith("Service", StringComparison.OrdinalIgnoreCase))
-				{
-					logger.Trace("DI Registration: Found {svc} (service implementation)", t.Name);
-					serviceImplementations.Add(t);
-				}
-				else
-				{
-					// Ignore the rest of the types in the assembly
-					logger.Trace("DI Registration: Ignoring {item}", t.Name);
-				}
+				AddTypeForInjection(inj, interfaceList, implementationList, singletonList, otherList);
 			}
 
-			RegisterServices(serviceCollection, serviceInterfaces.OrderBy(t => t.Name).ToList(), serviceImplementations.OrderBy(t => t.Name).ToList(), logger);
-		}
-
-		private void RegisterServices(IServiceCollection serviceCollection, List<Type> interfaces, List<Type> implementations, Logger logger)
-		{
-			// We're cheating here and taking advantage of the fact that every service has a corresponding interface.  So if
-			// we take a sorted list of services implementations and a sorted list of service interfaces, they'll match up.
-			for (var i = 0; i < interfaces.Count; i++)
+			// We can do this in one loop, using the larger of the interface and other lists as our counter.
+			// We're taking advantage of the fact that interfaces and implementations should have the same name,
+			// one with an I prefix on the interface, so they can be done in parallel.
+			int i = 0;
+			while (i < interfaceList.Count || i < singletonList.Count || i < otherList.Count)
 			{
-				logger.Debug("DI Registration: Registering service {interface}/{implementation}", interfaces[i].Name, implementations[i].Name);
-				serviceCollection.AddTransient(interfaces[i], implementations[i]);
+				if (i < interfaceList.Count)
+				{
+					_logger.Debug("DI Registration: Registering service {interfacename}, {implementationname}", interfaceList[i].Name, implementationList[i].Name);
+					serviceCollection.AddTransient(interfaceList[i], implementationList[i]);
+				}
+
+				if (i < singletonList.Count)
+				{
+					_logger.Debug("DI Registration: Registering singleton {singleton}", singletonList[i].Name);
+					serviceCollection.AddSingleton(singletonList[i]);
+				}
+
+				if (i < otherList.Count)
+				{
+					_logger.Debug("DI Registration: Registering other {other}", otherList[i].Name);
+					serviceCollection.AddTransient(otherList[i]);
+				}
+
+				i++;
 			}
 		}
 
-		private async Task VerifyOrCreateDatabase(Logger logger)
+		private void AddTypeForInjection(Type t, List<Type> interfaceList, List<Type> implementationList, List<Type> singletonList, List<Type> otherList)
+		{
+			// Check to see if there's a DependencyInjectionType attribute
+			var attribute = t.GetCustomAttribute<DependencyInjectionTypeAttribute>();
+			if (attribute == null)
+			{
+				_logger.Trace("DI Registration: Ignoring {other}", t.Name);
+				return;
+			}
+
+			switch (attribute.Type)
+			{
+				case DependencyInjectionType.Service:
+					_logger.Trace("DI Registration: Found service implementation {svc}", t.Name);
+					implementationList.Add(t);
+					break;
+
+				case DependencyInjectionType.Interface:
+					_logger.Trace("DI Registration: Found service interface {interface}", t.Name);
+					interfaceList.Add(t);
+					break;
+
+				case DependencyInjectionType.Singleton:
+					_logger.Trace("DI Registration: Found singleton {singleton}", t.Name);
+					singletonList.Add(t);
+					break;
+
+				case DependencyInjectionType.Other:
+					_logger.Trace("DI Registration: Found other {other}", t.Name);
+					otherList.Add(t);
+					break;
+
+				case DependencyInjectionType.None:
+				default:
+					_logger.Trace("DI Registration: Item {item} has an injection type of None and will be ignored", t.Name);
+					break;
+			}
+		}
+
+		private async Task VerifyOrCreateDatabase()
 		{
 			var config = ServiceProvider.GetService<IOptions<ApplicationSettings>>();
 
 			if (!File.Exists(config.Value.DataFileName))
 			{
-				logger.Debug("No database found.  Creating a new one.");
+				_logger.Debug("No database found.  Creating a new one.");
 				var dbService = ServiceProvider.GetService<IDatabaseService>();
 				await dbService.CreateDatabase();
 			}
 			else
 			{
-				logger.Debug("Found existing database.");
+				_logger.Debug("Found existing database.");
 			}
 		}
 
 		private List<Type> GetAllReferencedAssemblyTypes()
 		{
 			var assemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies();
-			var validAssemblies = assemblies.Where(a => loadableAssemblyNames.Contains(a.Name)).ToList();
-			Debug.WriteLine($"Found {validAssemblies.Count} assemblies with types to load.  Expected {loadableAssemblyNames.Length}.");
+			var validAssemblies = assemblies.Where(a => _loadableAssemblyNames.Contains(a.Name)).ToList();
+			_logger.Trace("Valid assemblies: {assemblies}", string.Join(",", validAssemblies));
 
 			var returnList = new List<Type>();
 			foreach (var assm in validAssemblies)
