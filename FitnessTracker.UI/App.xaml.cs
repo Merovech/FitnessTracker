@@ -13,7 +13,10 @@ using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.UI.Views;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NLog;
+using NLog.Extensions.Logging;
 
 namespace FitnessTracker.UI
 {
@@ -44,29 +47,69 @@ namespace FitnessTracker.UI
 
 			Configuration = configBuilder.Build();
 			serviceCollection.Configure<ApplicationSettings>(Configuration.GetSection("settings"));
+			LogManager.Configuration = new NLogLoggingConfiguration(Configuration.GetSection("NLog"));
+			serviceCollection.AddLogging(builder =>
+			{
+				builder.ClearProviders();
+				builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+				builder.AddNLog();
+			});
 
-			RegisterInjectables(serviceCollection);
+			NLog.LogLevel logLevel = Configuration.GetSection("settings")["logLevel"] switch
+			{
+				"Debug" => NLog.LogLevel.Debug,
+				"Trace" => NLog.LogLevel.Trace,
+				_ => NLog.LogLevel.Debug
+			};
+
+			SetNLogLevel(logLevel);
+
+			var logger = LogManager.GetCurrentClassLogger();
+			logger.Debug("Application startup");
+			RegisterInjectables(serviceCollection, logger);
 			ServiceProvider = serviceCollection.BuildServiceProvider();
-			Task.Run(async () => await VerifyOrCreateDatabase()).Wait();
+			Task.Run(async () => await VerifyOrCreateDatabase(logger)).Wait();
 		}
 
 		private void OnStartup(object sender, StartupEventArgs e)
 		{
 			var mainWindow = ServiceProvider.GetService<MainWindowView>();
 			mainWindow.Show();
-
-			base.OnStartup(e);
 		}
 
-		private void RegisterInjectables(IServiceCollection serviceCollection)
+		private void OnExit(object sender, ExitEventArgs e)
 		{
-			var types = Assembly.GetExecutingAssembly().GetTypes().ToList();
+			var logger = LogManager.GetCurrentClassLogger();
+			logger.Debug("Application exit");
+		}
+
+		private void SetNLogLevel(NLog.LogLevel level)
+		{
+			if (level == NLog.LogLevel.Debug)
+			{
+				GlobalDiagnosticsContext.Set("GlobalDebugLevel", "Debug");
+				GlobalDiagnosticsContext.Set("GlobalTraceLevel", "Off");
+			}
+			else if (level == NLog.LogLevel.Trace)
+			{
+				GlobalDiagnosticsContext.Set("GlobalDebugLevel", "Off");
+				GlobalDiagnosticsContext.Set("GlobalTraceLevel", "Trace");
+			}
+
+			LogManager.ReconfigExistingLoggers();
+		}
+
+		private void RegisterInjectables(IServiceCollection serviceCollection, Logger logger)
+		{
+			var types = Assembly.GetExecutingAssembly().ExportedTypes.ToList();
 			types.AddRange(GetAllReferencedAssemblyTypes());
+			logger.Trace("DI Registration: Found {count} potential injectables.", types.Count);
 
 			var serviceInterfaces = new List<Type>();
 			var serviceImplementations = new List<Type>();
 
 			// MainViewModel is a special case, as it's the entry point for the app
+			logger.Debug("DI Registration: MainViewModel (singleton)");
 			var mainViewModel = types.FirstOrDefault(t => t.Name == nameof(MainWindowView));
 			serviceCollection.AddSingleton(mainViewModel);
 
@@ -78,45 +121,53 @@ namespace FitnessTracker.UI
 			{
 				if (t.Name.EndsWith("ViewModel", StringComparison.OrdinalIgnoreCase))
 				{
-					Debug.WriteLine($"Registering view model: {t.Name}.");
+					logger.Debug("DI Registration: Registering view model {vm}", t.Name);
 					serviceCollection.AddTransient(t);
 				}
 				else if (t.IsInterface && t.Name.EndsWith("Service", StringComparison.OrdinalIgnoreCase))
 				{
-					Debug.WriteLine($"Registering service interface: {t.Name}.");
+					logger.Trace("DI Registration: Found {svci} (service interface)", t.Name);
 					serviceInterfaces.Add(t);
 				}
 				else if (!t.IsInterface && t.Name.EndsWith("Service", StringComparison.OrdinalIgnoreCase))
 				{
-					Debug.WriteLine($"Registering service: {t.Name}.");
+					logger.Trace("DI Registration: Found {svc} (service implementation)", t.Name);
 					serviceImplementations.Add(t);
 				}
-
-				// Ignore the rest of the types in the assembly
+				else
+				{
+					// Ignore the rest of the types in the assembly
+					logger.Trace("DI Registration: Ignoring {item}", t.Name);
+				}
 			}
 
-			RegisterServices(serviceCollection, serviceInterfaces.OrderBy(t => t.Name).ToList(), serviceImplementations.OrderBy(t => t.Name).ToList());
+			RegisterServices(serviceCollection, serviceInterfaces.OrderBy(t => t.Name).ToList(), serviceImplementations.OrderBy(t => t.Name).ToList(), logger);
 		}
 
-		private void RegisterServices(IServiceCollection serviceCollection, List<Type> interfaces, List<Type> implementations)
+		private void RegisterServices(IServiceCollection serviceCollection, List<Type> interfaces, List<Type> implementations, Logger logger)
 		{
 			// We're cheating here and taking advantage of the fact that every service has a corresponding interface.  So if
 			// we take a sorted list of services implementations and a sorted list of service interfaces, they'll match up.
 			for (var i = 0; i < interfaces.Count; i++)
 			{
-				Debug.WriteLine($"Registering service: {interfaces[i].Name}, {implementations[i].Name}");
+				logger.Debug("DI Registration: Registering service {interface}/{implementation}", interfaces[i].Name, implementations[i].Name);
 				serviceCollection.AddTransient(interfaces[i], implementations[i]);
 			}
 		}
 
-		private async Task VerifyOrCreateDatabase()
+		private async Task VerifyOrCreateDatabase(Logger logger)
 		{
 			var config = ServiceProvider.GetService<IOptions<ApplicationSettings>>();
 
 			if (!File.Exists(config.Value.DataFileName))
 			{
+				logger.Debug("No database found.  Creating a new one.");
 				var dbService = ServiceProvider.GetService<IDatabaseService>();
 				await dbService.CreateDatabase();
+			}
+			else
+			{
+				logger.Debug("Found existing database.");
 			}
 		}
 
@@ -130,7 +181,7 @@ namespace FitnessTracker.UI
 			foreach (var assm in validAssemblies)
 			{
 				var loadedAssembly = Assembly.Load(assm);
-				returnList.AddRange(loadedAssembly.GetTypes());
+				returnList.AddRange(loadedAssembly.ExportedTypes);
 			}
 
 			return returnList;
