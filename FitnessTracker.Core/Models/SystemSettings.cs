@@ -17,11 +17,9 @@ namespace FitnessTracker.Core.Models
 
 		public bool IsDarkTheme { get; set; }
 
-		public string ToDebugString()
+		public override string ToString()
 		{
-			var weightMin = WeightGraphMinimum.HasValue ? WeightGraphMinimum.Value.ToString() : "(null)";
-			var weightMax = WeightGraphMaximum.HasValue ? WeightGraphMaximum.Value.ToString() : "(null)";
-			return $"DarkTheme={IsDarkTheme}, WeightUnit={WeightUnit}, WeightGraphMinimum={weightMin}, WeightGraphMaximum={weightMax}";
+			return $"DarkTheme={IsDarkTheme}, WeightUnit={WeightUnit}, WeightGraphMinimum={WeightGraphMinimum}, WeightGraphMaximum={WeightGraphMaximum}";
 		}
 	}
 }

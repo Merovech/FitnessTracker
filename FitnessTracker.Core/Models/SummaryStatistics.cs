@@ -17,5 +17,10 @@ namespace FitnessTracker.Core.Models
 		public DateTime? HighestWeightDate { get; set; }
 
 		public double? WeightChangeSincePrevious { get; set; }
+
+		public override string ToString()
+		{
+			return $"Current={CurrentWeight} ({TotalWeightChange}),Lowest={LowestWeight} ({LowestWeightDate}),Highest={HighestWeight} ({HighestWeightDate}),Change={WeightChangeSincePrevious}";
+		}
 	}
 }

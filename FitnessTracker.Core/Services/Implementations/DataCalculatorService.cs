@@ -4,13 +4,21 @@ using System.Linq;
 using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.Utilities;
+using Microsoft.Extensions.Logging;
 
 namespace FitnessTracker.Core.Services.Implementations
 {
 	[DependencyInjectionType(DependencyInjectionType.Service)]
 	public class DataCalculatorService : IDataCalculatorService
 	{
+		private readonly ILogger<DataCalculatorService> _logger;
 		private const int _averageWindowInDays = 5;
+
+		public DataCalculatorService(ILogger<DataCalculatorService> logger)
+		{
+			Guard.AgainstNull(logger, nameof(logger));
+			_logger = logger;
+		}
 
 		public void FillCalculatedDataFields(IEnumerable<DailyRecord> data)
 		{
@@ -23,6 +31,7 @@ namespace FitnessTracker.Core.Services.Implementations
 
 		public SummaryStatistics CalculateSummaryStatistics(IEnumerable<DailyRecord> data)
 		{
+			_logger.LogDebug($"Calculating summary statistics for {data.Count()} records.");
 			if (data == null || !data.Any())
 			{
 				return null;
@@ -80,6 +89,7 @@ namespace FitnessTracker.Core.Services.Implementations
 
 			CleanupCalculatedValues(retVal);
 
+			_logger.LogDebug("Summary calculation complete.  Result: {result}", retVal);
 			return retVal;
 		}
 
