@@ -7,6 +7,7 @@ namespace FitnessTracker.UI.Extensions
 	public class EnumBindingSourceExtension : MarkupExtension
 	{
 		private Type _enumType;
+
 		public Type EnumType
 		{
 			get => _enumType;

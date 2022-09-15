@@ -47,6 +47,21 @@ namespace FitnessTracker.UI
 
 			Configuration = configBuilder.Build();
 			serviceCollection.Configure<ApplicationSettings>(Configuration.GetSection("settings"));
+
+			var appConfig = Configuration.GetSection("settings");
+			ConfigureLogging(serviceCollection, appConfig);
+
+			_logger = LogManager.GetCurrentClassLogger();
+			_logger.Debug("Application startup");
+			RegisterInjectables(serviceCollection);
+
+			ServiceProvider = serviceCollection.BuildServiceProvider();
+
+			Task.Run(async () => await VerifyOrCreateDatabase()).Wait();
+		}
+
+		private void ConfigureLogging(ServiceCollection serviceCollection, IConfigurationSection config)
+		{
 			LogManager.Configuration = new NLogLoggingConfiguration(Configuration.GetSection("NLog"));
 			serviceCollection.AddLogging(builder =>
 			{
@@ -55,20 +70,17 @@ namespace FitnessTracker.UI
 				builder.AddNLog();
 			});
 
-			NLog.LogLevel logLevel = Configuration.GetSection("settings")["logLevel"] switch
+			NLog.LogLevel logLevel = config.GetSection("settings")["logLevel"] switch
 			{
 				"Debug" => NLog.LogLevel.Debug,
 				"Trace" => NLog.LogLevel.Trace,
 				_ => NLog.LogLevel.Debug
 			};
 
-			SetNLogLevel(logLevel);
 
-			_logger = LogManager.GetCurrentClassLogger();
-			_logger.Debug("Application startup");
-			RegisterInjectables(serviceCollection);
-			ServiceProvider = serviceCollection.BuildServiceProvider();
-			Task.Run(async () => await VerifyOrCreateDatabase()).Wait();
+			bool.TryParse(config["enableLogging"], out bool enableLogging);
+
+			SetNLogLevel(logLevel, enableLogging);
 		}
 
 		private void OnStartup(object sender, StartupEventArgs e)
@@ -82,9 +94,14 @@ namespace FitnessTracker.UI
 			_logger.Debug("Application exit");
 		}
 
-		private void SetNLogLevel(NLog.LogLevel level)
+		private void SetNLogLevel(NLog.LogLevel level, bool isEnabled)
 		{
-			if (level == NLog.LogLevel.Debug)
+			if (!isEnabled)
+			{
+				GlobalDiagnosticsContext.Set("GlobalDebugLevel", "Off");
+				GlobalDiagnosticsContext.Set("GlobalTraceLevel", "Off");
+			}
+			else if (level == NLog.LogLevel.Debug)
 			{
 				GlobalDiagnosticsContext.Set("GlobalDebugLevel", "Debug");
 				GlobalDiagnosticsContext.Set("GlobalTraceLevel", "Off");

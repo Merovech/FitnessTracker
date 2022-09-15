@@ -16,5 +16,12 @@ namespace FitnessTracker.Core.Models
 			get; 
 			set; 
 		} = NLog.LogLevel.Debug;
+
+		[JsonPropertyName("enableLogging")]
+		public bool EnableLogging
+		{
+			get;
+			set;
+		}
 	}
 }
