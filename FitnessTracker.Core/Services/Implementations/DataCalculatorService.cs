@@ -31,7 +31,7 @@ namespace FitnessTracker.Core.Services.Implementations
 
 		public SummaryStatistics CalculateSummaryStatistics(IEnumerable<DailyRecord> data)
 		{
-			_logger.LogDebug($"Calculating summary statistics for {data.Count()} records.");
+			_logger.LogDebug($"Calculating summary statistics for {data?.Count()} records.");
 			if (data == null || !data.Any())
 			{
 				return null;

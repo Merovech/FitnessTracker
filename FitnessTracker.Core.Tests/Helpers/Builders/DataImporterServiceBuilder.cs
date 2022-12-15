@@ -4,6 +4,7 @@ using FitnessTracker.Core.ImportPreparer.Interfaces;
 using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Implementations;
 using FitnessTracker.Core.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace FitnessTracker.Core.Tests.Helpers.Builders
@@ -28,6 +29,12 @@ namespace FitnessTracker.Core.Tests.Helpers.Builders
 			set;
 		}
 
+		public ILogger<DataImporterService> Logger
+		{
+			get;
+			set;
+		}
+
 		public DataImporterServiceBuilder()
 		{
 			SetupMocks(true);
@@ -35,13 +42,13 @@ namespace FitnessTracker.Core.Tests.Helpers.Builders
 
 		public IDataImporterService Build()
 		{
-			return new DataImporterService(DatabaseService, ImportPreparerFactory);
+			return new DataImporterService(DatabaseService, ImportPreparerFactory, Logger);
 		}
 
 		public IDataImporterService BuildWithNoImportPreparer()
 		{
 			SetupMocks(false);
-			return new DataImporterService(DatabaseService, ImportPreparerFactory);
+			return new DataImporterService(DatabaseService, ImportPreparerFactory, Logger);
 		}
 
 		public void VerifyUpsertIsCalled(Times callTimes)
@@ -76,6 +83,7 @@ namespace FitnessTracker.Core.Tests.Helpers.Builders
 
 			DatabaseService = _databaseServiceMock.Object;
 			ImportPreparerFactory = _importPreparerFactoryMock.Object;
+			Logger = new Mock<ILogger<DataImporterService>>().Object;
 		}
 	}
 }
