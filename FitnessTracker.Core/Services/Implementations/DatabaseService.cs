@@ -7,9 +7,11 @@ using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.Utilities;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 
 namespace FitnessTracker.Core.Services.Implementations
 {
+	[DependencyInjectionType(DependencyInjectionType.Service)]
 	public class DatabaseService : IDatabaseService
 	{
 		private const string GET_ALL_QUERY = "SELECT * FROM Records";
@@ -18,18 +20,24 @@ namespace FitnessTracker.Core.Services.Implementations
 		private const string INSERT_QUERY = "INSERT INTO Records (Date, Weight) VALUES (@Date, @Weight)";
 		private readonly IConfigurationService _configService;
 		private readonly IDataCalculatorService _dataCalculatorService;
+		private readonly ILogger<DatabaseService> _logger;
 
-		public DatabaseService(IDataCalculatorService dataCalculatorService, IConfigurationService configService)
+		public DatabaseService(IDataCalculatorService dataCalculatorService, IConfigurationService configService, ILogger<DatabaseService> logger)
 		{
 			Guard.AgainstNull(configService, nameof(configService));
 			_configService = configService;
 
 			Guard.AgainstNull(dataCalculatorService, nameof(dataCalculatorService));
 			_dataCalculatorService = dataCalculatorService;
+
+			Guard.AgainstNull(logger, nameof(logger));
+			_logger = logger;
 		}
 
 		public async Task<IEnumerable<DailyRecord>> GetAllRecords()
 		{
+			_logger.LogInformation("Retrieving all records.");
+
 			using (var conn = new SqliteConnection(_configService.DatabaseConnectionString))
 			{
 				var command = new SqliteCommand(GET_ALL_QUERY, conn);
@@ -62,13 +70,16 @@ namespace FitnessTracker.Core.Services.Implementations
 				{
 					_dataCalculatorService.FillCalculatedDataFields(records);
 				}
-				
+
+				_logger.LogInformation("Records found: {recordCount}", records.Count);
 				return records;
 			}
 		}
 
 		public async Task<DailyRecord> GetRecordByDate(DateTime recordDate)
 		{
+			_logger.LogInformation("Attempting to find record with date {date}", recordDate);
+
 			using (var conn = new SqliteConnection(_configService.DatabaseConnectionString))
 			{
 				var command = new SqliteCommand(GET_SINGLE_QUERY, conn);
@@ -79,9 +90,11 @@ namespace FitnessTracker.Core.Services.Implementations
 
 				if (!reader.HasRows)
 				{
+					_logger.LogInformation("No record found.");
 					return null;
 				}
 
+				_logger.LogInformation("Record found.");
 				await reader.ReadAsync();
 				var returnRecord = new DailyRecord { Id = reader.GetInt32(0), Date = reader.GetDateTime(1), Weight = reader.GetDouble(2) };
 				reader.Close();
@@ -91,16 +104,20 @@ namespace FitnessTracker.Core.Services.Implementations
 
 		public async Task UpsertRecord(DateTime date, double weight)
 		{
+			_logger.LogInformation("Upserting record for date {date}", date);
+
 			var existingRecord = await GetRecordByDate(date);
 			using (var conn = new SqliteConnection(_configService.DatabaseConnectionString))
 			{
 				var cmdText = string.Empty;
 				if (existingRecord == null)
 				{
+					_logger.LogInformation("No record found.  Inserting as new record.");
 					cmdText = INSERT_QUERY;
 				}
 				else
 				{
+					_logger.LogInformation("Record found.  Updating existing record.");
 					cmdText = UPDATE_QUERY;
 				}
 
@@ -115,6 +132,8 @@ namespace FitnessTracker.Core.Services.Implementations
 
 		public async Task UpsertRecords(IEnumerable<DailyRecord> records)
 		{
+			_logger.LogInformation("Upserting {count} records.", records.Count());
+
 			Guard.AgainstNull(records, nameof(records));
 			Guard.AgainstEmptyList(records, nameof(records));
 
@@ -152,6 +171,8 @@ namespace FitnessTracker.Core.Services.Implementations
 
 		public async Task CreateDatabase()
 		{
+			_logger.LogInformation("Creating new database.");
+
 			using (var conn = new SqliteConnection(_configService.DatabaseConnectionString))
 			{
 				var command = new SqliteCommand { Connection = conn };

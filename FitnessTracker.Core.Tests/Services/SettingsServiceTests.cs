@@ -58,6 +58,14 @@ namespace FitnessTracker.Core.Tests.Services
 				Builder.ConfigurationService = null;
 				_ = Builder.Build();
 			}
+
+			[TestMethod]
+			[ExpectedException(typeof(ArgumentNullException))]
+			public void Should_Fail_With_Null_Logger()
+			{
+				Builder.Logger = null;
+				_ = Builder.Build();
+			}
 		}
 
 		[TestClass]

@@ -8,6 +8,20 @@ namespace FitnessTracker.Core.Models
 		public string DataFileName
 		{
 			get; set;
-		} 
+		}
+
+		[JsonPropertyName("logLevel")]
+		public NLog.LogLevel LogLevel
+		{
+			get; 
+			set; 
+		} = NLog.LogLevel.Debug;
+
+		[JsonPropertyName("enableLogging")]
+		public bool EnableLogging
+		{
+			get;
+			set;
+		}
 	}
 }

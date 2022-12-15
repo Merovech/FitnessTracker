@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
+using FitnessTracker.Core;
 using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.UI.Messages;
@@ -10,6 +11,7 @@ using MaterialDesignThemes.Wpf;
 
 namespace FitnessTracker.UI.ViewModels
 {
+	[DependencyInjectionType(DependencyInjectionType.Other)]
 	public class SettingsViewModel : ViewModelBase
 	{
 		private readonly ISettingsService _settingsService;

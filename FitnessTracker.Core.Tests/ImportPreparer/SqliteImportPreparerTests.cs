@@ -9,6 +9,7 @@ using FitnessTracker.Core.Tests.Helpers;
 using FitnessTracker.Core.Tests.Helpers.Builders;
 using FitnessTracker.Services.Implementations;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
@@ -17,6 +18,8 @@ namespace FitnessTracker.Core.Tests.ImportPreparer
 	[TestClass]
 	public class SqliteImportPreparerTests : TestBase<IImportPreparer, SqliteImportPreparerBuilder>
 	{
+		private DataCalculatorServiceBuilder _dataCalculatorServiceBuilder = new();
+
 		protected IDatabaseService DatabaseService
 		{
 			get;
@@ -27,7 +30,7 @@ namespace FitnessTracker.Core.Tests.ImportPreparer
 			var configMock = new Mock<ConfigurationService>() { CallBase = true };
 			configMock.Setup(c => c.DatabaseConnectionString).Returns($"Data Source={Constants.IMPORT_DATABASE_FILENAME}");
 
-			DatabaseService = new DatabaseService(new DataCalculatorService(), configMock.Object);
+			DatabaseService = new DatabaseService(_dataCalculatorServiceBuilder.Build(), configMock.Object, new Mock<ILogger<DatabaseService>>().Object);
 		}
 
 		[TestInitialize]

@@ -5,6 +5,7 @@ using FitnessTracker.Core.Models;
 using FitnessTracker.Core.Services.Implementations;
 using FitnessTracker.Core.Services.Interfaces;
 using FitnessTracker.Services.Implementations;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
@@ -26,6 +27,12 @@ namespace FitnessTracker.Core.Tests.Helpers.Builders
 			set;
 		}
 
+		public ILogger<DatabaseService> Logger
+		{
+			get;
+			set;
+		}
+
 		public DatabaseServiceBuilder()
 		{
 			SetupMocks();
@@ -33,7 +40,7 @@ namespace FitnessTracker.Core.Tests.Helpers.Builders
 
 		public IDatabaseService Build()
 		{
-			return new DatabaseService(DataCalculatorService, ConfigurationService);
+			return new DatabaseService(DataCalculatorService, ConfigurationService, Logger);
 		}
 
 		public void VerifyRecordListsAreEqual(List<DailyRecord> expected, List<DailyRecord> actual)
@@ -54,6 +61,10 @@ namespace FitnessTracker.Core.Tests.Helpers.Builders
 
 			_dataCalculatorServiceMock = new Mock<IDataCalculatorService>();
 			DataCalculatorService = _dataCalculatorServiceMock.Object;
+			
+			var loggerMock = new Mock<ILogger<DatabaseService>>();
+			Logger = loggerMock.Object;
+
 		}
 	}
 }

@@ -4,6 +4,7 @@ using System;
 
 namespace FitnessTracker.Core.ImportPreparer.Implementations
 {
+	[DependencyInjectionType(DependencyInjectionType.Service)]
 	public class ImportPreparerFactory : IImportPreparerFactory
 	{
 		public IImportPreparer GetImportPreparer(FileType fileType)
